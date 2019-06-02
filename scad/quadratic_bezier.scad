@@ -3,7 +3,7 @@
 //https://www.youtube.com/watch?v=jVPJetq0BZg
 //
 
-deltat = 0.5;
+deltat = 0.02;
 function bezier(p0,p1,p2) = [for (t=[0:deltat:1+deltat]) pow(1-t,2)*p0+2*(1-t)*t*p1+pow(t,2)*p2];
     
 module line(p1,p2,w) {
