@@ -28,12 +28,12 @@ module hinge (hinge_width = 7, hinge_diameter = 5, hinge_height = 8, hinge_pin =
         }
 }
 
-module helical_vane (width = 1, length = 75, height = 10, spread = 4, twist = 5, direction = 1)
+module helical_vane (width = 1, length = 75, height = 10, spread = 4, direction = 1)
 {
     rotate([0,90,0])
         linear_extrude(height, center = false, convexity = 10, twist = -10, scale = 1.1)
             translate([-length/2 + 2*width,0,0])
-                polyline(bezier([0,-direction*spread],[length/2,-direction*twist],[length,direction*spread]),1,width);
+                polyline(bezier([0,-direction*spread],[length/2,-direction*spread],[length,direction*spread]),1,width);
 }
 
 module jig ( arrow_diameter = 6,
@@ -102,8 +102,7 @@ module jig ( arrow_diameter = 6,
                     helical_vane(width = vane_width, 
                                     length = vane_length, 
                                     height = base_diameter, 
-                                    spread = 2, 
-                                    twist = 2, 
+                                    spread = ((arrow_diameter/2) * sqrt(3))/2, //side of equilateral triangle in circumscribed cirle                               
                                     direction = 1);
             }
             else
