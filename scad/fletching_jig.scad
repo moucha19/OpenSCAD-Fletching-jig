@@ -30,9 +30,10 @@ module hinge (hinge_width = 7, hinge_diameter = 5, hinge_height = 8, hinge_pin =
 
 module helical_vane (width = 1, length = 75, height = 10, spread = 4, direction = 1)
 {
+    length = length - width;
     rotate([0,90,0])
-        linear_extrude(height, center = false, convexity = 10, twist = -10, scale = 1)
-            translate([-length/2 + 2*width,0,0])
+        linear_extrude(height, center = false, convexity = 10, twist = -15, scale = 1)
+            translate([-length/2,0,0])
                 polyline(bezier([0,-direction*spread],[length/2,-direction*spread],[length,direction*spread]),1,width);
 }
 
@@ -94,12 +95,13 @@ module jig ( arrow_diameter = 6,
             //vane and vane foot cutout
             if (vane_helical)
             {
-                //TODO x translate must be to the edge of arm curve
-                translate([0,0, vane_length/2 + arrow_offset + vane_offset])
+                //x is the distance from center to the side of the inscribed triangle
+                x = arrow_diameter/2 - (arrow_diameter/2)*(1-cos(60));
+                translate([x,0, vane_length/2 + arrow_offset + vane_offset])
                     helical_vane(width = vane_width, 
                                     length = vane_length, 
                                     height = base_diameter, 
-                                    spread = ((arrow_diameter/2) * sqrt(3))/2, //side of equilateral triangle in circumscribed cirle                               
+                                    spread = ((arrow_diameter/2) * sqrt(3))/2 - vane_width/2, //side of equilateral triangle in circumscribed cirle                               
                                     direction = 1);
             }
             else
@@ -115,7 +117,7 @@ module jig ( arrow_diameter = 6,
     }
 
 }
-//hinge(hinge_width = 7, hinge_diameter = 6, hinge_height = 15, holer = false);
+
 jig ( arrow_diameter = 6,
              arrow_offset = 4,
              base_height = 20,
@@ -131,7 +133,3 @@ jig ( arrow_diameter = 6,
              vane_turn = 0,
              vane_helical = true
              ) ;
-
-*helical_vane();
-
-//linear_extrude(height = 5, center = true, convexity = 10, twist = 5) square([1,75], true);
