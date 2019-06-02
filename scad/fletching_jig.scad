@@ -31,7 +31,7 @@ module hinge (hinge_width = 7, hinge_diameter = 5, hinge_height = 8, hinge_pin =
 module helical_vane (width = 1, length = 75, height = 10, spread = 4, direction = 1)
 {
     rotate([0,90,0])
-        linear_extrude(height, center = false, convexity = 10, twist = -10, scale = 1.1)
+        linear_extrude(height, center = false, convexity = 10, twist = -10, scale = 1)
             translate([-length/2 + 2*width,0,0])
                 polyline(bezier([0,-direction*spread],[length/2,-direction*spread],[length,direction*spread]),1,width);
 }
@@ -58,10 +58,8 @@ module jig ( arrow_diameter = 6,
     //base
     difference()
     {
-        union()
-        {
-            
-            cylinder(base_height,d=base_diameter, true);
+        hull()
+        { 
             for (i = [0:2]) 
             {
                 rotate(a=[0,0,i*120]) translate([0,-hinge_width,0]) 
@@ -70,7 +68,6 @@ module jig ( arrow_diameter = 6,
         }
         translate([0,0,arrow_offset]) cylinder(base_height,d=arrow_diameter, true);
         //hinge holer
-
         for (i = [0:2]) 
         {
             rotate(a=[0,0,i*120]) 
