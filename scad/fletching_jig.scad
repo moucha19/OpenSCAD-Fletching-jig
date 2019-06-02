@@ -37,7 +37,8 @@ module jig ( arrow_diameter = 6,
              arm_offset = 1,
              vane_length = 75, 
              vane_width = 1, 
-             vane_offset = 25
+             vane_offset = 25,
+             vane_turn = 0
              ) 
 {
     base_diameter = arrow_diameter + 12;
@@ -82,8 +83,10 @@ module jig ( arrow_diameter = 6,
             //shaft hole
             translate([0,0,base_height]) 
                 cylinder(arm_height + base_height,d=arrow_diameter, true);
-            //vane and van foot cutout
-            translate([0,-vane_width/2,arrow_offset + vane_offset]) cube([base_diameter/2, vane_width, vane_length]);
+            //vane and vane foot cutout
+            translate([base_diameter/4,0, vane_length/2 + arrow_offset + vane_offset])
+                rotate([vane_turn,0,0])
+                    cube([base_diameter/2, vane_width, vane_length], true);
             translate([0,0,arrow_offset + vane_offset]) cylinder(vane_length,d=arrow_diameter + arm_gap, true);
         }
         translate([(base_diameter/2) - hinge_diameter/2, 0, base_height - hinge_depth + hinge_diameter/2]) 
@@ -103,7 +106,8 @@ jig ( arrow_diameter = 6,
              arm_offset = 1.5,
              vane_length = 75, 
              vane_width = 1, 
-             vane_offset = 25
+             vane_offset = 25,
+             vane_turn = 0
              ) ;
 
 //linear_extrude(height = 5, center = true, convexity = 10, twist = 5) square([1,75], true);
