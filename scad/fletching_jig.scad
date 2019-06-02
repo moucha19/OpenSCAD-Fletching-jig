@@ -1,3 +1,5 @@
+use <quadratic_bezier.scad>
+
 $fn=20;
 
 module hinge (hinge_width = 7, hinge_diameter = 5, hinge_height = 8, hinge_pin = 1.2, holer = true)
@@ -26,6 +28,14 @@ module hinge (hinge_width = 7, hinge_diameter = 5, hinge_height = 8, hinge_pin =
         }
 }
 
+module helical_vane (width = 1, length = 75, height = 10, spread = 4, twist = 5, direction = 1)
+{
+    rotate([0,90,0])
+        linear_extrude(height, center = false, convexity = 10, twist = -10, scale = 1.1)
+            translate([-length/2 + 2*width,0,0])
+                polyline(bezier([0,-direction*spread],[length/2,-direction*twist],[length,direction*spread]),1,width);
+}
+
 module jig ( arrow_diameter = 6,
              arrow_offset = 4,
              base_height = 20,
@@ -38,7 +48,8 @@ module jig ( arrow_diameter = 6,
              vane_length = 75, 
              vane_width = 1, 
              vane_offset = 25,
-             vane_turn = 0
+             vane_turn = 0,
+             vane_helical = false
              ) 
 {
     base_diameter = arrow_diameter + 12;
@@ -84,9 +95,23 @@ module jig ( arrow_diameter = 6,
             translate([0,0,base_height]) 
                 cylinder(arm_height + base_height,d=arrow_diameter, true);
             //vane and vane foot cutout
-            translate([base_diameter/4,0, vane_length/2 + arrow_offset + vane_offset])
-                rotate([vane_turn,0,0])
-                    cube([base_diameter/2, vane_width, vane_length], true);
+            if (vane_helical)
+            {
+                //TODO x translate must be to the edge of arm curve
+                translate([0,0, vane_length/2 + arrow_offset + vane_offset])
+                    helical_vane(width = vane_width, 
+                                    length = vane_length, 
+                                    height = base_diameter, 
+                                    spread = 2, 
+                                    twist = 2, 
+                                    direction = 1);
+            }
+            else
+            {
+                translate([base_diameter/4,0, vane_length/2 + arrow_offset + vane_offset])
+                    rotate([vane_turn,0,0])
+                        cube([base_diameter/2, vane_width, vane_length], true);
+            }
             translate([0,0,arrow_offset + vane_offset]) cylinder(vane_length,d=arrow_diameter + arm_gap, true);
         }
         translate([(base_diameter/2) - hinge_diameter/2, 0, base_height - hinge_depth + hinge_diameter/2]) 
@@ -107,7 +132,10 @@ jig ( arrow_diameter = 6,
              vane_length = 75, 
              vane_width = 1, 
              vane_offset = 25,
-             vane_turn = 0
+             vane_turn = 0,
+             vane_helical = true
              ) ;
+
+*helical_vane();
 
 //linear_extrude(height = 5, center = true, convexity = 10, twist = 5) square([1,75], true);
