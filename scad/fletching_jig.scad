@@ -2,6 +2,13 @@ use <quadratic_bezier.scad>
 
 $fn=50;
 
+//
+//Module that can create both parts of the hinge by changing holer value
+//# hinge_diameter - diameter of the cylinder that forms a joint; also depth of the hinge
+//# hinge_pin - size of the sphere that holds arm in the hinge
+//# holer - if true, outline of the joint will be created and can be later subtracted from another solid, creating opening for hinge itself
+//## hole_lip - adds extra depth to the holer, only useful for preview
+//
 module hinge (hinge_width = 7, hinge_diameter = 5, hinge_height = 8, hinge_pin = 1.2, holer = true)
 {
     hole_lip = 1;
@@ -28,15 +35,25 @@ module hinge (hinge_width = 7, hinge_diameter = 5, hinge_height = 8, hinge_pin =
         }
 }
 
+//
+//Creates helical vane
+//# height - extrusion height
+//# spread - horizontal distance between edges of the vane
+//# direction - signum determines left or right spin (+ left; - right)
+//
 module helical_vane (width = 1, length = 75, height = 10, spread = 4, direction = 1)
 {
+    direction = sign(direction);
     length = length - width;
     rotate([0,90,0])
-        linear_extrude(height, center = false, convexity = 10, twist = -15, scale = 1)
+        linear_extrude(height, center = false, twist = -15, scale = 1)
             translate([-length/2,0,0])
                 polyline(bezier([0,-direction*spread],[length/2,-direction*spread],[length,direction*spread]),1,width);
 }
 
+//
+//Creates basic shape of the jig's base
+//
 module base_mold (a = 8, radius = 15, height = 20)
 {
     hull()
@@ -146,9 +163,9 @@ jig (   arrow_diameter = 6,
         hinge_width = 6.5, 
         hinge_diameter = 5,
         hinge_depth = 10, 
-        arm_height = 90,
+        arm_height = 90,//-
         arm_gap = 0.5,         
-        arm_offset = 1.5,
+        arm_offset = 1.5,//-
         vane_length = 75, 
         vane_width = 1, 
         vane_offset = 25,
