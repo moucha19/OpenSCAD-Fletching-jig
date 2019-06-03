@@ -37,6 +37,18 @@ module helical_vane (width = 1, length = 75, height = 10, spread = 4, direction 
                 polyline(bezier([0,-direction*spread],[length/2,-direction*spread],[length,direction*spread]),1,width);
 }
 
+module base_mold (a = 8, radius = 15, height = 20)
+{
+    hull()
+    { 
+        for (i = [0:2]) 
+        {
+            rotate(a=[0,0,i*120]) translate([0,-a,0]) 
+                cube([radius, a*2, height], false);
+        }
+    }
+}
+
 module jig ( arrow_diameter = 6,
              arrow_offset = 4,
              base_height = 20,
@@ -62,14 +74,7 @@ module jig ( arrow_diameter = 6,
     //base
     difference()
     {
-        hull()
-        { 
-            for (i = [0:2]) 
-            {
-                rotate(a=[0,0,i*120]) translate([0,-hinge_width,0]) 
-                    cube([base_radius, hinge_width*2, base_height], false);
-            }
-        }
+        base_mold(a = hinge_width, radius = base_radius, height = base_height);
         translate([0,0,arrow_offset]) cylinder(base_height,d=arrow_diameter, true);
         //hinge holer
         for (i = [0:2]) 
@@ -109,7 +114,7 @@ module jig ( arrow_diameter = 6,
             }
             else
             {
-                translate([base_diameter/4,0, vane_length/2 + arrow_offset + vane_offset])
+                translate([base_radius/2,0, vane_length/2 + arrow_offset + vane_offset])
                     rotate([vane_turn,0,0])
                         cube([base_radius, vane_width, vane_length], true);
             }
@@ -119,21 +124,33 @@ module jig ( arrow_diameter = 6,
                             hinge (hinge_width - hinge_gap, hinge_diameter - hinge_gap, hinge_depth + hinge_diameter + arm_offset, 1.2, false);
     }
 
+    //lid
+    lid_thickness = 1;
+    lid_lip = 2;
+    lid_gap = 0;
+
+    translate([3*base_radius,0,0]) difference()
+    {
+        h = arm_height - (vane_offset - arm_offset - base_height + vane_length);
+        base_mold(a = hinge_width + lid_thickness, radius = base_radius + lid_thickness, height = h);
+        translate([0,0,lid_thickness] )base_mold(a = hinge_width + lid_gap, radius = base_radius + lid_gap, height = h);
+        base_mold(a = hinge_width - lid_lip, radius = base_radius - lid_lip, height = h);
+    }
 }
 
-jig ( arrow_diameter = 8,
-             arrow_offset = 4,
-             base_height = 20,
-             hinge_width = 8, 
-             hinge_diameter = 5,
-             hinge_depth = 10, 
-             arm_height = 90,
-             arm_gap = 0.5,         
-             arm_offset = 1.5,
-             vane_length = 75, 
-             vane_width = 1, 
-             vane_offset = 25,
-             vane_turn = 0,
-             helical = true,
-             helical_adjust = 0
-             ) ;
+jig (   arrow_diameter = 8,
+        arrow_offset = 4,
+        base_height = 20,
+        hinge_width = 8, 
+        hinge_diameter = 5,
+        hinge_depth = 10, 
+        arm_height = 90,
+        arm_gap = 0.5,         
+        arm_offset = 1.5,
+        vane_length = 75, 
+        vane_width = 1, 
+        vane_offset = 25,
+        vane_turn = 0,
+        helical = true,
+        helical_adjust = 0
+        ) ;
