@@ -1,6 +1,6 @@
 use <quadratic_bezier.scad>
 
-$fn=20;
+$fn=50;
 
 module hinge (hinge_width = 7, hinge_diameter = 5, hinge_height = 8, hinge_pin = 1.2, holer = true)
 {
@@ -138,10 +138,12 @@ module jig ( arrow_diameter = 6,
     }
 }
 
-jig (   arrow_diameter = 8,
+//6 mm arrow
+
+jig (   arrow_diameter = 6,
         arrow_offset = 4,
         base_height = 20,
-        hinge_width = 8, 
+        hinge_width = 6.5, 
         hinge_diameter = 5,
         hinge_depth = 10, 
         arm_height = 90,
@@ -152,5 +154,5 @@ jig (   arrow_diameter = 8,
         vane_offset = 25,
         vane_turn = 0,
         helical = true,
-        helical_adjust = 0
+        helical_adjust = 0.5
         ) ;
