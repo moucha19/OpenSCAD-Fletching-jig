@@ -144,14 +144,16 @@ module jig ( arrow_diameter = 6,
     //lid
     lid_thickness = 1;
     lid_lip = 2;
-    lid_gap = 0;
+    lid_gap = 0.25;
 
-    translate([3*base_radius,0,0]) difference()
+    !translate([3*base_radius,0,0]) difference()
     {
         h = arm_height - (vane_offset - arm_offset - base_height + vane_length);
-        base_mold(a = hinge_width + lid_thickness, radius = base_radius + lid_thickness, height = h);
-        translate([0,0,lid_thickness] )base_mold(a = hinge_width + lid_gap, radius = base_radius + lid_gap, height = h);
-        base_mold(a = hinge_width - lid_lip, radius = base_radius - lid_lip, height = h);
+        w = hinge_width + lid_gap;
+        r = base_radius + lid_gap;
+        base_mold(a = w + lid_thickness, radius = r + lid_thickness, height = h);
+        translate([0,0,lid_thickness] )base_mold(a = w, radius = r, height = h);
+        base_mold(a = w - lid_lip, radius = r - lid_lip, height = h);
     }
 }
 
