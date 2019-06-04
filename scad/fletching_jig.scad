@@ -46,7 +46,7 @@ module helical_vane (width = 1, length = 75, height = 10, spread = 4, direction 
     direction = sign(direction);
     length = length - width;
     rotate([0,90,0])
-        linear_extrude(height, center = false, twist = -15, scale = 1)
+        linear_extrude(height, center = false, twist = -direction*15, scale = 1)
             translate([-length/2,0,0])
                 polyline(bezier([0,-direction*spread],[length/2,-direction*spread],[length,direction*spread]),1,width);
 }
@@ -79,7 +79,9 @@ module jig ( arrow_diameter = 6,
              vane_width = 1, 
              vane_offset = 25,
              vane_turn = 0,
-             vane_helical = false
+             helical = true,
+             helical_adjust = 0.5,
+             helical_direction = 1
              ) 
 {
     base_diameter = arrow_diameter + 12;
@@ -127,7 +129,7 @@ module jig ( arrow_diameter = 6,
                                     length = vane_length, 
                                     height = base_diameter, 
                                     spread = ((arrow_radius) * sqrt(3))/2 - vane_width/2 - helical_adjust, //side of equilateral triangle in circumscribed cirle                               
-                                    direction = 1);
+                                    direction = helical_direction);
             }
             else
             {
@@ -171,5 +173,6 @@ jig (   arrow_diameter = 6,
         vane_offset = 25,
         vane_turn = 0,
         helical = true,
-        helical_adjust = 0.5
+        helical_adjust = 0.5,
+        helical_direction = 1
         ) ;
