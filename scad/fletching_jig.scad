@@ -9,7 +9,7 @@ $fn=50;
 //# holer - if true, outline of the joint will be created and can be later subtracted from another solid, creating opening for hinge itself
 //## hole_lip - adds extra depth to the holer, only useful for preview
 //
-module hinge (hinge_width = 7, hinge_diameter = 5, hinge_height = 8, hinge_pin = 1.2, holer = true)
+module hinge (hinge_width = 7, hinge_diameter = 5, hinge_height = 8, hinge_pin = 2.4, holer = true)
 {
     hole_lip = 1;
     translate([0,hinge_width/2,0]) rotate([90,-90,0]) mirror([0,1,0])
@@ -17,8 +17,8 @@ module hinge (hinge_width = 7, hinge_diameter = 5, hinge_height = 8, hinge_pin =
         {
             union()
             {
-                translate([0,0,hinge_width - 0.2]) sphere(hinge_pin);
-                translate([0,0,0 + 0.2]) sphere(hinge_pin);
+                translate([0,0,hinge_width - 0.2]) sphere(d=hinge_pin);
+                translate([0,0,0 + 0.2]) sphere(d=hinge_pin);
                 cylinder(hinge_width,d=hinge_diameter, true);     
                 translate([hinge_height/2,0,hinge_width/2]) cube([hinge_height,hinge_diameter,hinge_width], true);
                 if (holer)
@@ -61,7 +61,7 @@ module base_mold (a = 8, radius = 15, height = 20)
         for (i = [0:2]) 
         {
             rotate(a=[0,0,i*120]) translate([0,-a,0]) 
-                cube([radius, a*2, height], false);
+                cube([radius, 2*a, height], false);
         }
     }
 }
@@ -72,7 +72,7 @@ module jig ( arrow_diameter = 6,
              hinge_width = 7, 
              hinge_diameter = 5,
              hinge_depth = 10, 
-             arm_height = 90,
+             hinge_pin = 2.4,
              arm_gap = 0.5,         //gap between arm and arrow shaft
              arm_offset = 1,
              vane_length = 75, 
@@ -88,6 +88,7 @@ module jig ( arrow_diameter = 6,
     base_radius = base_diameter/2;
     arrow_radius = arrow_diameter/2;
     hinge_radius = hinge_diameter/2;
+    arm_height = vane_length + 2*(vane_offset-arm_offset-(base_height - arrow_offset));
     hinge_gap = 0.1;
 
     //base
@@ -100,7 +101,7 @@ module jig ( arrow_diameter = 6,
         {
             rotate(a=[0,0,i*120]) 
                 translate([(base_radius) - hinge_radius, 0, base_height - hinge_depth + hinge_radius]) 
-                        hinge (hinge_width, hinge_diameter, hinge_depth + hinge_diameter + arm_offset, 1.2, true);
+                        hinge (hinge_width, hinge_diameter, hinge_depth + hinge_diameter + arm_offset, hinge_pin, true);
         }
     }
 
@@ -140,7 +141,7 @@ module jig ( arrow_diameter = 6,
             translate([0,0,arrow_offset + vane_offset]) cylinder(vane_length,d=arrow_diameter + arm_gap, true);
         }
         translate([base_radius - hinge_radius, 0, base_height - hinge_depth + hinge_radius]) 
-                            hinge (hinge_width - hinge_gap, hinge_diameter - hinge_gap, hinge_depth + hinge_diameter + arm_offset, 1.2, false);
+                            hinge (hinge_width - hinge_gap, hinge_diameter - hinge_gap, hinge_depth + hinge_diameter + arm_offset, hinge_pin, false);
     }
 
     //lid
@@ -150,7 +151,7 @@ module jig ( arrow_diameter = 6,
 
     translate([3*base_radius,0,0]) difference()
     {
-        h = arm_height - (vane_offset - arm_offset - base_height + vane_length);
+        h = vane_offset-arm_offset-(base_height - arrow_offset) + lid_thickness;
         w = hinge_width + lid_gap;
         r = base_radius + lid_gap;
         base_mold(a = w + lid_thickness, radius = r + lid_thickness, height = h);
@@ -166,10 +167,10 @@ jig (   arrow_diameter = 6,
         base_height = 20,
         hinge_width = 6.5, 
         hinge_diameter = 5,
-        hinge_depth = 10, 
-        arm_height = 90,//-
+        hinge_depth = 10,
+        hinge_pin = 2.4,
         arm_gap = 0.5,         
-        arm_offset = 1.5,//-
+        arm_offset = 1.5,
         vane_length = 75, 
         vane_width = 1, 
         vane_offset = 25,
