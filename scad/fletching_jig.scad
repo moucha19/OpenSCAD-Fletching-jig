@@ -32,22 +32,22 @@ module base_mold (a = 8, radius = 15, height = 20)
     }
 }
 
-module jig ( arrow_diameter = 6,
-             arrow_offset = 4,
-             base_height = 20,
-             hinge_width = 7, 
-             hinge_diameter = 5,
-             hinge_depth = 10, 
-             hinge_pin = 2.4,
-             arm_gap = 0.5,         //gap between arm and arrow shaft
-             arm_offset = 1,
-             vane_length = 75, 
-             vane_width = 1, 
-             vane_offset = 25,
-             vane_turn = 0,
-             helical = true,
-             helical_adjust = 0.5,
-             helical_direction = 1
+module jig (    arrow_diameter = 6,
+                arrow_offset = 3,
+                base_height = 20,
+                hinge_width = 6.5, 
+                hinge_diameter = 5,
+                hinge_depth = 10,
+                hinge_pin = 3,
+                arm_gap = 0.5,         
+                arm_offset = 1.5,
+                vane_length = 75, 
+                vane_width = 1.1, 
+                vane_offset = 25,
+                vane_turn = 0,
+                helical = false,
+                helical_adjust = 0.5,
+                helical_direction = 1
              ) 
 {
     base_diameter = arrow_diameter + 12;
@@ -95,7 +95,7 @@ module jig ( arrow_diameter = 6,
                     helical_vane(width = vane_width, 
                                     length = vane_length, 
                                     height = base_diameter, 
-                                    spread = ((arrow_radius) * sqrt(3))/2 - vane_width/2 - helical_adjust, //side of equilateral triangle in circumscribed cirle                               
+                                    spread = (arrow_radius * sqrt(3))/2 - vane_width/2 - helical_adjust, //side of equilateral triangle in circumscribed cirle                               
                                     direction = helical_direction);
             }
             else
@@ -107,7 +107,7 @@ module jig ( arrow_diameter = 6,
             translate([0,0,arrow_offset + vane_offset]) cylinder(vane_length,d=arrow_diameter + arm_gap, true);
         }
         translate([base_radius - hinge_radius, 0, base_height - hinge_depth + hinge_radius]) 
-                            hinge (hinge_width - hinge_gap, hinge_diameter - hinge_gap, hinge_depth + hinge_diameter + arm_offset, hinge_pin, false);
+                            hinge (hinge_width - hinge_gap, hinge_diameter - hinge_gap, hinge_depth + hinge_diameter + arm_offset, hinge_pin - hinge_gap, false);
     }
 
     //lid
