@@ -1,6 +1,6 @@
 use <fletching_jig.scad>
 
-$fn=100;
+$fn=10;
 
 //6 mm arrow - straight
 
@@ -15,14 +15,10 @@ $fn=100;
         arm_offset = 1.5,
         vane_length = 72, 
         vane_width = 1.1, 
-        vane_offset = 25,
-        vane_turn = 0,
-        helical = false,
-        helical_adjust = 0.5,
-        helical_direction = 1
+        vane_offset = 25
     );
 
-//6 mm arrow - helical left - 0.7
+//6 mm arrow - helical left - 3.5
 
 jig (   arrow_diameter = 6,
         arrow_offset = 3,
@@ -36,13 +32,12 @@ jig (   arrow_diameter = 6,
         vane_length = 72, 
         vane_width = 1.1, 
         vane_offset = 25,
-        vane_turn = 0,
         helical = true,
-        helical_adjust = 0.7,
+        helical_adjust = 3.5,
         helical_direction = 1
     );
 
-//8 mm arrow - helical right - 0.5
+//8 mm arrow - helical right - 3.5
 
 *jig (   arrow_diameter = 8,
         arrow_offset = 3,
@@ -58,7 +53,7 @@ jig (   arrow_diameter = 6,
         vane_offset = 25,
         vane_turn = 0,
         helical = true,
-        helical_adjust = 0.6,
+        helical_adjust = 3.5,
         helical_direction = -1
     );
 

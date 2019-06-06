@@ -89,11 +89,11 @@ module jig (    arrow_diameter = 6,
             //vane
             if (helical)
             {
-                //r - radius of arrow with gap for vane foot minus correction
-                //t - factor of maximum spread (side of equilateral triangle in circumscribed cirle    )
-                //x - the distance from center to arm based on t
+                //r - radius of arrow + gap for vane foot - correction
+                //t - values from 0 to maximum spread (side of equilateral triangle in circumscribed cirle)
+                //x - distance from center to arm based on t
                 r = arrow_radius+arm_gap-0.35;
-                t = helical_adjust*(r * sqrt(3));
+                t = helical_adjust < (r * sqrt(3)) ? helical_adjust : (r * sqrt(3));
                 x = sqrt(pow(r,2) - pow(t,2)/4);
                 echo (r, t, x);
                 translate([x,0, vane_length/2 + arrow_offset + vane_offset])
