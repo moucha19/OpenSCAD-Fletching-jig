@@ -13,8 +13,8 @@ module hinge (hinge_width = 7, hinge_diameter = 5, hinge_height = 8, hinge_pin =
         {
             union()
             {
-                translate([0,0,hinge_width - 0.2]) sphere(d=hinge_pin);
-                translate([0,0,0 + 0.2]) sphere(d=hinge_pin);
+                translate([0,0,hinge_width]) sphere(d=hinge_pin);
+                sphere(d=hinge_pin);
                 cylinder(hinge_width,d=hinge_diameter, true);     
                 translate([hinge_height/2,0,hinge_width/2]) cube([hinge_height,hinge_diameter,hinge_width], true);
                 if (holer)
