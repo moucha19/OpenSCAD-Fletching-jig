@@ -14,7 +14,7 @@ module helical_vane (width = 1, length = 75, height = 10, spread = 4, direction 
     rotate([0,90,0])
         linear_extrude(height, center = false, twist = -direction*15, scale = 1)
             translate([-length/2,0,0])
-                polyline(bezier([0,-direction*spread],[length/2,-direction*spread],[length,direction*spread]),1,width);
+                bezier([0,-direction*spread],[0.5*length,-direction*spread],[length,direction*spread],width);
 }
 
 //
@@ -46,7 +46,7 @@ module jig (    arrow_diameter = 6,
                 vane_offset = 25,
                 vane_turn = 0,
                 helical = false,
-                helical_adjust = 0.5,
+                helical_adjust = 1,
                 helical_direction = 1
              ) 
 {
@@ -86,16 +86,21 @@ module jig (    arrow_diameter = 6,
             //shaft hole
             translate([0,0,base_height]) 
                 cylinder(arm_height + base_height,d=arrow_diameter, true);
-            //vane and vane foot cutout
+            //vane
             if (helical)
             {
-                //x is the distance from center to the side of the inscribed triangle
-                x = (arrow_radius+arm_gap) - (arrow_radius+arm_gap)*(1-cos(60));
+                //r - radius of arrow with gap for vane foot minus correction
+                //t - factor of maximum spread (side of equilateral triangle in circumscribed cirle    )
+                //x - the distance from center to arm based on t
+                r = arrow_radius+arm_gap-0.35;
+                t = helical_adjust*(r * sqrt(3));
+                x = sqrt(pow(r,2) - pow(t,2)/4);
+                echo (r, t, x);
                 translate([x,0, vane_length/2 + arrow_offset + vane_offset])
                     helical_vane(width = vane_width, 
                                     length = vane_length, 
                                     height = base_diameter, 
-                                    spread = (arrow_radius * sqrt(3))/2 - vane_width/2 - helical_adjust, //side of equilateral triangle in circumscribed cirle                               
+                                    spread = t/2 - vane_width/2,                            
                                     direction = helical_direction);
             }
             else
@@ -104,7 +109,8 @@ module jig (    arrow_diameter = 6,
                     rotate([vane_turn,0,0])
                         cube([base_radius, vane_width, vane_length], true);
             }
-            translate([0,0,arrow_offset + vane_offset]) cylinder(vane_length,d=arrow_diameter + arm_gap, true);
+            //vane foot cutout
+            translate([0,0,arrow_offset + vane_offset]) cylinder(vane_length,r=arrow_radius + arm_gap, true);
         }
         translate([base_radius - hinge_radius, 0, base_height - hinge_depth + hinge_radius]) 
                             hinge (hinge_width - hinge_gap, hinge_diameter - hinge_gap, hinge_depth + arm_offset - hinge_radius, hinge_pin - hinge_gap, false);
