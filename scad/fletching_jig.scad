@@ -67,7 +67,7 @@ module jig (    arrow_diameter = 6,
         {
             rotate(a=[0,0,i*120]) 
                 translate([(base_radius) - hinge_radius, 0, base_height - hinge_depth + hinge_radius]) 
-                        hinge (hinge_width, hinge_diameter, hinge_depth + hinge_diameter + arm_offset, hinge_pin, true);
+                        hinge (hinge_width, hinge_diameter, hinge_depth + arm_offset - hinge_radius, hinge_pin, true);
         }
     }
 
@@ -107,7 +107,7 @@ module jig (    arrow_diameter = 6,
             translate([0,0,arrow_offset + vane_offset]) cylinder(vane_length,d=arrow_diameter + arm_gap, true);
         }
         translate([base_radius - hinge_radius, 0, base_height - hinge_depth + hinge_radius]) 
-                            hinge (hinge_width - hinge_gap, hinge_diameter - hinge_gap, hinge_depth + hinge_diameter + arm_offset, hinge_pin - hinge_gap, false);
+                            hinge (hinge_width - hinge_gap, hinge_diameter - hinge_gap, hinge_depth + arm_offset - hinge_radius, hinge_pin - hinge_gap, false);
     }
 
     //lid
