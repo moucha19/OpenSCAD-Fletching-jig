@@ -1,8 +1,8 @@
 use <fletching_jig.scad>
 
 
-// render resolution
-$fn=10; // [10:10:100]
+// increase to improve render quality
+$fn=30; // [10:10:100]
 
 /* [Jig settings] */
 
