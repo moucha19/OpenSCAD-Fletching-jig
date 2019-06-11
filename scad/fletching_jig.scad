@@ -35,20 +35,20 @@ module base_mold (a = 8, radius = 15, height = 20)
 //
 //All three main components of the jig are created here - arm, base and clamping lid
 //# arrow_diameter - slightly bigger than the arrow itself (may vary depending on your printer)
-//# arrow_offset - distance between bottom of the base and arrow in the jig
+//# arrow_offset - distance between the bottom of the base and arrow
 //# base_height - height of the base
 //# hinge_width - width of the hinge cutout on the base
-//# hinge_diameter - diameter of the circular part of the hinge, that forms a joint
-//# hinge_depth - how deep into base is the hinge cutout
-//# hinge_pin - diameter of the sphere that connects two parts of the hinge together 
+//# hinge_diameter - diameter of the circular part of the hinge that forms a joint
+//# hinge_depth - how deep into the base is the hinge cutout
+//# hinge_pin - diameter of the sphere that connects two halves of the hinge together 
 //# arm_gap - gap for the vane foot, so that tension during clamping is distributed evenly
-//# arm_offset - distance between top of the base and bottom of the arm
+//# arm_offset - distance between the top of the base and bottom of the arm
 //# vane_length - length of the vane
 //# vane_width - width of the vane
 //# vane_offset - how far from the end of the arrow will the vane be
 //# vane_turn - sets OFFSET fletching in degrees
 //# helical - if true, HELICAL fletching will be used
-//# helical_adjust - horizontal distance between bottom and top corner of the HELICAL vane
+//# helical_adjust - horizontal distance between the bottom and top corner of the HELICAL vane
 //# helical_direction - sign of the value determines left or right spin (+ left; - right)
 //
 module jig (    arrow_diameter = 6,
