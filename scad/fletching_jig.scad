@@ -5,7 +5,7 @@ use <hinge.scad>
 //Creates helical vane
 //# height - extrusion height
 //# spread - horizontal distance between edges of the vane
-//# direction - signum determines left or right spin (+ left; - right)
+//# direction - sign of the value determines left or right spin (+ left; - right)
 //
 module helical_vane (width = 1, length = 75, height = 10, spread = 4, direction = 1)
 {
@@ -32,6 +32,25 @@ module base_mold (a = 8, radius = 15, height = 20)
     }
 }
 
+//
+//All three main components of the jig are created here - arm, base and clamping lid
+//# arrow_diameter - slightly bigger than the arrow itself (may vary depending on your printer)
+//# arrow_offset - distance between bottom of the base and arrow in the jig
+//# base_height - height of the base
+//# hinge_width - width of the hinge cutout on the base
+//# hinge_diameter - diameter of the circular part of the hinge, that forms a joint
+//# hinge_depth - how deep into base is the hinge cutout
+//# hinge_pin - diameter of the sphere that connects two parts of the hinge together 
+//# arm_gap - gap for the vane foot, so that tension during clamping is distributed evenly
+//# arm_offset - distance between top of the base and bottom of the arm
+//# vane_length - length of the vane
+//# vane_width - width of the vane
+//# vane_offset - how far from the end of the arrow will the vane be
+//# vane_turn - sets OFFSET fletching in degrees
+//# helical - if true, HELICAL fletching will be used
+//# helical_adjust - horizontal distance between bottom and top corner of the HELICAL vane
+//# helical_direction - sign of the value determines left or right spin (+ left; - right)
+//
 module jig (    arrow_diameter = 6,
                 arrow_offset = 3,
                 base_height = 20,
@@ -46,7 +65,7 @@ module jig (    arrow_diameter = 6,
                 vane_offset = 25,
                 vane_turn = 0,
                 helical = false,
-                helical_adjust = 1,
+                helical_adjust = 3.5,
                 helical_direction = 1
              ) 
 {
@@ -79,6 +98,7 @@ module jig (    arrow_diameter = 6,
         {
             translate([0,-hinge_width,base_height + arm_offset])  
                 cube([base_radius, hinge_width*2, arm_height], false);
+            //intersections with two remaining arms
             rotate(a = 120) translate([-hinge_width*2,0,base_height + arm_offset]) 
                 cube([hinge_width*4, arrow_diameter, arm_height], false);
             rotate(a = -120) mirror([0,1,0]) translate([-hinge_width*2,0,base_height + arm_offset]) 
@@ -117,6 +137,7 @@ module jig (    arrow_diameter = 6,
     }
 
     //lid
+
     lid_thickness = 1;
     lid_lip = 2;
     lid_gap = 0.25;

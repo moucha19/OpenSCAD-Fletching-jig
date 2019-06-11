@@ -4,7 +4,7 @@ $fn=10;
 
 //6 mm arrow - straight
 
-*jig (   arrow_diameter = 6,
+*jig (  arrow_diameter = 6,
         arrow_offset = 3,
         base_height = 20,
         hinge_width = 6.5, 
@@ -39,7 +39,7 @@ jig (   arrow_diameter = 6,
 
 //8 mm arrow - helical right - 3.5
 
-*jig (   arrow_diameter = 8,
+*jig (  arrow_diameter = 8,
         arrow_offset = 3,
         base_height = 20,
         hinge_width = 6.5, 

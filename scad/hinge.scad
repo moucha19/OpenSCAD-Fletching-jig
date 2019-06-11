@@ -1,7 +1,7 @@
 //
 //Module that can create both parts of the hinge by changing holer value
 //# hinge_diameter - diameter of the cylinder that forms a joint; also depth of the hinge
-//# hinge_pin - size of the sphere that holds arm in the hinge
+//# hinge_pin - diameter of the sphere that connects two parts of the hinge together 
 //# holer - if true, outline of the joint will be created and can be later subtracted from another solid, creating opening for hinge itself
 //## hole_lip - adds extra depth to the holer, only useful for preview
 //
