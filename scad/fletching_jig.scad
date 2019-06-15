@@ -69,7 +69,7 @@ module jig (    arrow_diameter = 6,
                 helical_direction = 1
              ) 
 {
-    base_diameter = arrow_diameter + 12;
+    base_diameter = arrow_diameter + 2*hinge_diameter + 1.5;
     base_radius = base_diameter/2;
     arrow_radius = arrow_diameter/2;
     hinge_radius = hinge_diameter/2;
