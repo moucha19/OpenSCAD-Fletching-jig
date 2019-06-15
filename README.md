@@ -21,7 +21,9 @@ Additional software required will vary depending on your 3D printer.
 
 Download and extract latest release somewhere on your PC. Then open [main.scad](./scad/main.scad) file in OpenSCAD. You can close the editor on the left.
 
-You should see customizer window on the right. There you can change following parameters.
+You should see customizer window on the right. There you can change parameters listed below. Nothing prevents you from inserting invalid values, messing up the design in the process - so be reasonable. I'd advise you to change parameters you're sure about first (arrow_diameter, vane_length etc.) and then adjust the rest.
+
+Press *F6* when you're happy with the result and then navigate to *File > Export > Export as STL* to save rendered mesh as a file.
 
 Parameter | Description
 --- | ---
@@ -44,8 +46,6 @@ helical_direction | sign of the value determines left or right spin (+ left; - r
 
 ![](./img/dimensions_1.png)
 ![](./img/dimensions_2.png)
-
-Press *F6* when you're happy with the result and then navigate to *File > Export > Export as STL* to save rendered mesh as a file.
 
 ***
 
