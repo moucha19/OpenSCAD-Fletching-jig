@@ -26,8 +26,8 @@ module base_mold (a = 8, radius = 15, height = 20)
     { 
         for (i = [0:2]) 
         {
-            rotate(a=[0,0,i*120]) translate([0,-a,0]) 
-                cube([radius, 2*a, height], false);
+            rotate(a=[0,0,i*120]) translate([0,-a/2,0]) 
+                cube([radius, a, height], false);
         }
     }
 }
@@ -69,17 +69,24 @@ module jig (    arrow_diameter = 6,
                 helical_direction = 1
              ) 
 {
+    //input corrections
+    hinge_depth = hinge_depth <= base_height ? hinge_depth : base_height;
+    hinge_diameter = hinge_diameter <= hinge_depth ? hinge_diameter : hinge_depth;
+    hinge_pin = hinge_pin <= hinge_diameter ? hinge_pin : hinge_diameter;
+    //TODO arm_gap, arm_offset, vane_offset, arrow_offset, base_height
+
     base_diameter = arrow_diameter + 2*hinge_diameter + 1.5;
     base_radius = base_diameter/2;
     arrow_radius = arrow_diameter/2;
     hinge_radius = hinge_diameter/2;
     arm_height = vane_length + 2*(vane_offset-arm_offset-(base_height - arrow_offset));
+    arm_width = 2*hinge_width;
     hinge_gap = 0.1;
 
     //base
     difference()
     {
-        base_mold(a = hinge_width, radius = base_radius, height = base_height);
+        base_mold(a = arm_width, radius = base_radius, height = base_height);
         translate([0,0,arrow_offset]) cylinder(base_height,d=arrow_diameter, true);
         //hinge holer
         for (i = [0:2]) 
@@ -97,11 +104,11 @@ module jig (    arrow_diameter = 6,
         difference()
         {
             translate([0,-hinge_width,base_height + arm_offset])  
-                cube([base_radius, hinge_width*2, arm_height], false);
+                cube([base_radius, arm_width, arm_height], false);
             //intersections with two remaining arms
-            rotate(a = 120) translate([-hinge_width*2,0,base_height + arm_offset]) 
+            rotate(a = 120) translate([ arm_width,0,base_height + arm_offset]) 
                 cube([hinge_width*4, arrow_diameter, arm_height], false);
-            rotate(a = -120) mirror([0,1,0]) translate([-hinge_width*2,0,base_height + arm_offset]) 
+            rotate(a = -120) mirror([0,1,0]) translate([ arm_width,0,base_height + arm_offset]) 
                 cube([hinge_width*4, arrow_diameter, arm_height], false);
             //shaft hole
             translate([0,0,base_height]) 
@@ -145,7 +152,7 @@ module jig (    arrow_diameter = 6,
     translate([3*base_radius,0,0]) difference()
     {
         h = vane_offset-arm_offset-(base_height - arrow_offset) + lid_thickness;
-        w = hinge_width + lid_gap;
+        w = arm_width + lid_gap;
         r = base_radius + lid_gap;
         base_mold(a = w + lid_thickness, radius = r + lid_thickness, height = h);
         translate([0,0,lid_thickness] )base_mold(a = w, radius = r, height = h);
