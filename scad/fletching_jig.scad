@@ -1,5 +1,6 @@
 use <quadratic_bezier.scad>
 use <hinge.scad>
+use <MCAD/regular_shapes.scad>
 
 //
 //Creates helical vane
@@ -106,10 +107,10 @@ module jig (    arrow_diameter = 6,
             translate([0,-hinge_width,base_height + arm_offset])  
                 cube([base_radius, arm_width, arm_height], false);
             //intersections with two remaining arms
-            rotate(a = 120) translate([ arm_width,0,base_height + arm_offset]) 
-                cube([hinge_width*4, arrow_diameter, arm_height], false);
-            rotate(a = -120) mirror([0,1,0]) translate([ arm_width,0,base_height + arm_offset]) 
-                cube([hinge_width*4, arrow_diameter, arm_height], false);
+            rotate(a = 120) translate([ -arm_width,0,base_height + arm_offset]) 
+                cube([arm_width*2, arrow_diameter, arm_height], false);
+            rotate(a = -120) mirror([0,1,0]) translate([ -arm_width,0,base_height + arm_offset]) 
+                cube([arm_width*2, arrow_diameter, arm_height], false);
             //shaft hole
             translate([0,0,base_height]) 
                 cylinder(arm_height + base_height,d=arrow_diameter, true);
@@ -138,6 +139,16 @@ module jig (    arrow_diameter = 6,
             }
             //vane foot cutout
             translate([0,0,arrow_offset + vane_offset]) cylinder(vane_length,r=arrow_radius + arm_gap, true);
+            minkowski()
+            {
+                translate([0,0,arrow_offset + vane_offset]) cylinder(vane_length,r=arrow_radius, true);
+                rotate_extrude(angle = 360, convexity = 2) 
+                difference()
+                {
+                    rotate([0,0,90]) ellipse(4*arm_gap, 2*arm_gap);
+                    translate([0,-2*arm_gap]) square(4*arm_gap, false);
+                }
+            }
         }
         translate([base_radius - hinge_radius, 0, base_height - hinge_depth + hinge_radius]) 
                             hinge (hinge_width - hinge_gap, hinge_diameter - hinge_gap, hinge_depth + arm_offset - hinge_radius, hinge_pin - hinge_gap, false);
