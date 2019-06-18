@@ -70,12 +70,21 @@ module jig (    arrow_diameter = 6,
                 helical_direction = 1
              ) 
 {
+    //tresholds
+    min_vane_offset = (base_height - arrow_offset) + arm_offset + 4;
+
+    //error report
+    echo(vane_offset);
+    if (vane_offset == min_vane_offset) echo(str("<font color='red'>Invalid value! Minimal vane_offset for current setup is ", min_vane_offset, "</font>"));
+
     //input corrections
     hinge_depth = hinge_depth <= base_height ? hinge_depth : base_height;
     hinge_diameter = hinge_diameter <= hinge_depth ? hinge_diameter : hinge_depth;
     hinge_pin = hinge_pin <= hinge_diameter ? hinge_pin : hinge_diameter;
+    vane_offset = vane_offset >= min_vane_offset ? vane_offset : min_vane_offset;
     //TODO arm_gap, arm_offset, vane_offset, arrow_offset, base_height
 
+    //internal variables
     base_diameter = arrow_diameter + 2*hinge_diameter + 1.5;
     base_radius = base_diameter/2;
     arrow_radius = arrow_diameter/2;
