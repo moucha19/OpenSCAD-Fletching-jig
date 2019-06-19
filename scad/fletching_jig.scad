@@ -72,17 +72,25 @@ module jig (    arrow_diameter = 6,
 {
     //tresholds
     min_vane_offset = (base_height - arrow_offset) + arm_offset + 4;
+    min_base_height = 5;
 
     //error report
-    echo(vane_offset);
-    if (vane_offset == min_vane_offset) echo(str("<font color='red'>Invalid value! Minimal vane_offset for current setup is ", min_vane_offset, "</font>"));
+    echo(str("<font color='blue'>Minimal value for vane_offset is ", min_vane_offset, "</font>"));
+    if (vane_offset == min_vane_offset) echo(str("<font color='red'>vane_offset treshold reached!</font>"));
+    if (arrow_offset == base_height) echo(str("<font color='red'>arrow_offset treshold reached!</font>"));
 
     //input corrections
-    hinge_depth = hinge_depth <= base_height ? hinge_depth : base_height;
-    hinge_diameter = hinge_diameter <= hinge_depth ? hinge_diameter : hinge_depth;
-    hinge_pin = hinge_pin <= hinge_diameter ? hinge_pin : hinge_diameter;
+    base_height = base_height >= min_base_height ? base_height : min_base_height;
+    hinge_depth = abs(hinge_depth) <= base_height ? abs(hinge_depth) : base_height;
+    hinge_diameter = abs(hinge_diameter) <= hinge_depth ? abs(hinge_diameter) : hinge_depth;
+    hinge_pin = abs(hinge_pin) <= hinge_diameter ? abs(hinge_pin) : hinge_diameter;
     vane_offset = vane_offset >= min_vane_offset ? vane_offset : min_vane_offset;
-    //TODO arm_gap, arm_offset, vane_offset, arrow_offset, base_height
+    arrow_offset = abs(arrow_offset) <= base_height ? abs(arrow_offset) : base_height;
+    arrow_diameter = abs(arrow_diameter);
+    vane_width = abs(vane_width);
+    vane_length = abs(vane_length);
+    arm_offset = abs(arm_offset);
+    //TODO arm_gap (base_diameter), vane_turn, hinge_width(!!!)
 
     //internal variables
     base_diameter = arrow_diameter + 2*hinge_diameter + 1.5;
@@ -132,7 +140,6 @@ module jig (    arrow_diameter = 6,
                 r = arrow_radius+arm_gap-0.35;
                 t = helical_adjust < (r * sqrt(3)) ? helical_adjust : (r * sqrt(3));
                 x = sqrt(pow(r,2) - pow(t,2)/4);
-                echo (r, t, x);
                 translate([x,0, vane_length/2 + arrow_offset + vane_offset])
                     helical_vane(width = vane_width, 
                                     length = vane_length, 
