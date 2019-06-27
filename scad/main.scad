@@ -3,6 +3,7 @@ use <fletching_jig.scad>
 
 // increase to improve render quality
 $fn=30; // [10:10:100]
+part_select = "all"; //["all":All, "arm":Arm only, "base":Base only, "lid":Lid only]
 
 /* [Jig settings] */
 
@@ -51,6 +52,7 @@ helical_adjust = 3.5; //[0:0.1:30]
 helical_direction = 1;//[1:left, -1:right]
 
 jig (
+        "all",
         arrow_diameter,
         arrow_offset,
         base_height,

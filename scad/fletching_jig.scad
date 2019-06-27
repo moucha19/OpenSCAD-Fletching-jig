@@ -52,7 +52,8 @@ module base_mold (a = 8, radius = 15, height = 20)
 //# helical_adjust - horizontal distance between the bottom and top corner of the HELICAL vane
 //# helical_direction - sign of the value determines left or right spin (+ left; - right)
 //
-module jig (    arrow_diameter = 6,
+module jig (    part_select = "all",
+                arrow_diameter = 6,
                 arrow_offset = 3,
                 base_height = 20,
                 hinge_width = 6.5, 
@@ -76,8 +77,8 @@ module jig (    arrow_diameter = 6,
 
     //error report
     echo(str("<font color='blue'>Minimal value for vane_offset is ", min_vane_offset, "</font>"));
-    if (vane_offset == min_vane_offset) echo(str("<font color='red'>vane_offset treshold reached!</font>"));
-    if (arrow_offset == base_height) echo(str("<font color='red'>arrow_offset treshold reached!</font>"));
+    if (vane_offset == min_vane_offset) echo(str("<font color='red'>vane_offset treshold (", min_vane_offset, ") reached!</font>"));
+    if (arrow_offset == base_height) echo(str("<font color='red'>arrow_offset treshold (", base_height, ") reached!</font>"));
 
     //input corrections
     base_height = base_height >= min_base_height ? base_height : min_base_height;
@@ -85,7 +86,7 @@ module jig (    arrow_diameter = 6,
     hinge_diameter = abs(hinge_diameter) <= hinge_depth ? abs(hinge_diameter) : hinge_depth;
     hinge_pin = abs(hinge_pin) <= hinge_diameter ? abs(hinge_pin) : hinge_diameter;
     vane_offset = vane_offset >= min_vane_offset ? vane_offset : min_vane_offset;
-    arrow_offset = abs(arrow_offset) <= base_height ? abs(arrow_offset) : base_height;
+    //arrow_offset = abs(arrow_offset) <= base_height ? abs(arrow_offset) : base_height;
     arrow_diameter = abs(arrow_diameter);
     vane_width = abs(vane_width);
     vane_length = abs(vane_length);
