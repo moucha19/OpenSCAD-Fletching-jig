@@ -14,7 +14,10 @@ arrow_offset = 3;
 
 base_height = 20;
 
-hinge_width = 6.5;//[0:0.1:15]   
+hinge_width = 6.5;//[0:0.1:30]  
+
+//thickness of the hinge extension attached to the bottom of the arm
+hinge_thickness = 1.5;
 
 //diameter of the hinge's circular part
 hinge_diameter = 5;
@@ -56,7 +59,8 @@ jig (
         arrow_diameter,
         arrow_offset,
         base_height,
-        hinge_width, 
+        hinge_width,
+        hinge_thickness,  
         hinge_diameter,
         hinge_depth,
         hinge_pin,

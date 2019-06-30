@@ -39,6 +39,7 @@ module base_mold (a = 8, radius = 15, height = 20)
 //# arrow_offset - distance between the bottom of the base and arrow
 //# base_height - height of the base
 //# hinge_width - width of the hinge cutout on the base
+//# hinge_thickness - thickness of the hinge extension attached to the bottom of the arm
 //# hinge_diameter - diameter of the circular part of the hinge that forms a joint
 //# hinge_depth - how deep into the base is the hinge cutout
 //# hinge_pin - diameter of the sphere that connects two halves of the hinge together 
@@ -56,7 +57,8 @@ module jig (    part_select = 0,
                 arrow_diameter = 6,
                 arrow_offset = 3,
                 base_height = 20,
-                hinge_width = 6.5, 
+                hinge_width = 6.5,
+                hinge_thickness = 1.5, 
                 hinge_diameter = 5,
                 hinge_depth = 10,
                 hinge_pin = 3,
@@ -71,37 +73,47 @@ module jig (    part_select = 0,
                 helical_direction = 1
              ) 
 {
+    //independent internal variables
+    hinge_gap = 0.1;
+    flag_showAll = part_select == 0 ? 0 : 1; 
+
     //tresholds
     min_vane_offset = (base_height - arrow_offset) + arm_offset + 4;
     min_base_height = 5;
-
-    //error report
-    echo(str("<font color='blue'>Minimal value for vane_offset is ", min_vane_offset, "</font>"));
-    if (vane_offset == min_vane_offset) echo(str("<font color='red'>vane_offset treshold (", min_vane_offset, ") reached!</font>"));
-    if (arrow_offset == base_height) echo(str("<font color='red'>arrow_offset treshold (", base_height, ") reached!</font>"));
+    max_hinge_width = (3*arrow_diameter)/sqrt(3); //inscribed circle in equilateral triangle formula
+    min_hinge_thickness = 1;
+    max_hinge_thickness = (hinge_width-hinge_pin-hinge_gap)/2;
 
     //input corrections
     base_height = base_height >= min_base_height ? base_height : min_base_height;
     hinge_depth = abs(hinge_depth) <= base_height ? abs(hinge_depth) : base_height;
     hinge_diameter = abs(hinge_diameter) <= hinge_depth ? abs(hinge_diameter) : hinge_depth;
     hinge_pin = abs(hinge_pin) <= hinge_diameter ? abs(hinge_pin) : hinge_diameter;
+    hinge_width = abs(hinge_width) <= max_hinge_width ? abs(hinge_width) : max_hinge_width;
+    hinge_thickness = abs(hinge_thickness) >= min_hinge_thickness && abs(hinge_thickness) <= max_hinge_thickness
+                        ? abs(hinge_thickness) : min_hinge_thickness;
     vane_offset = vane_offset >= min_vane_offset ? vane_offset : min_vane_offset;
     arrow_offset = abs(arrow_offset) <= base_height ? abs(arrow_offset) : base_height;
     arrow_diameter = abs(arrow_diameter);
     vane_width = abs(vane_width);
     vane_length = abs(vane_length);
     arm_offset = abs(arm_offset);
-    //TODO arm_gap (base_diameter), vane_turn, hinge_width(!!!)
+    //TODO arm_gap (base_diameter), vane_turn, hinge_width minimum
 
-    //internal variables
-    base_diameter = arrow_diameter + 2*hinge_diameter + 1.5;
+    //error report
+    echo(str("<font color='blue'>Minimal value for vane_offset with current setup is ", min_vane_offset, "</font>"));
+    if (vane_offset == min_vane_offset) echo(str("<font color='red'>vane_offset treshold (min = ", min_vane_offset, ") reached!</font>"));
+    if (arrow_offset == base_height) echo(str("<font color='red'>arrow_offset treshold (max = ", base_height, ") reached!</font>"));
+    if (hinge_width == max_hinge_width) echo(str("<font color='red'>hinge_width treshold (max = ", max_hinge_width, ") reached!</font>"));
+    if (hinge_thickness == min_hinge_thickness) echo(str("<font color='red'>hinge_thickness treshold (min = ", min_hinge_thickness, ", max = ", max_hinge_thickness, ") reached!</font>"));
+
+    //dependent internal variables
+    base_diameter = arrow_diameter + 2*hinge_diameter + 2;
     base_radius = base_diameter/2;
     arrow_radius = arrow_diameter/2;
     hinge_radius = hinge_diameter/2;
     arm_height = vane_length + 2*(vane_offset-arm_offset-(base_height - arrow_offset));
-    arm_width = 2*hinge_width;
-    hinge_gap = 0.1;
-    flag_showAll = part_select == 0 ? 0 : 1; 
+    arm_width = hinge_width + hinge_pin + 3;
 
     //base
     if (part_select == 1 || part_select == 0)
@@ -114,7 +126,7 @@ module jig (    part_select = 0,
         {
             rotate(a=[0,0,i*120]) 
                 translate([(base_radius) - hinge_radius, 0, base_height - hinge_depth + hinge_radius]) 
-                        hinge (hinge_width, hinge_diameter, hinge_depth + arm_offset - hinge_radius, hinge_pin, true);
+                        hinge (hinge_width, hinge_thickness, hinge_diameter, hinge_depth + arm_offset - hinge_radius, hinge_pin, true);
         }
     }
 
@@ -126,7 +138,7 @@ module jig (    part_select = 0,
     {
         difference()
         {
-            translate([0,-hinge_width,base_height + arm_offset])  
+            translate([0,-arm_width/2,base_height + arm_offset])  
                 cube([base_radius, arm_width, arm_height], false);
             //intersections with two remaining arms
             rotate(a = 120) translate([ -arm_width,0,base_height + arm_offset]) 
@@ -172,7 +184,7 @@ module jig (    part_select = 0,
             }
         }
         translate([base_radius - hinge_radius, 0, base_height - hinge_depth + hinge_radius]) 
-                            hinge (hinge_width - hinge_gap, hinge_diameter - hinge_gap, hinge_depth + arm_offset - hinge_radius, hinge_pin - hinge_gap, false);
+                            hinge(hinge_width - hinge_gap, hinge_thickness, hinge_diameter - hinge_gap, hinge_depth + arm_offset - hinge_radius, hinge_pin - hinge_gap, false);
     }
 
     //lid
