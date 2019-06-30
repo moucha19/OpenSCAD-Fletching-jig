@@ -52,7 +52,7 @@ module base_mold (a = 8, radius = 15, height = 20)
 //# helical_adjust - horizontal distance between the bottom and top corner of the HELICAL vane
 //# helical_direction - sign of the value determines left or right spin (+ left; - right)
 //
-module jig (    part_select = "all",
+module jig (    part_select = 0,
                 arrow_diameter = 6,
                 arrow_offset = 3,
                 base_height = 20,
@@ -103,6 +103,7 @@ module jig (    part_select = "all",
     hinge_gap = 0.1;
 
     //base
+    if (part_select == 1 || part_select == 0)
     difference()
     {
         base_mold(a = arm_width, radius = base_radius, height = base_height);
@@ -117,7 +118,7 @@ module jig (    part_select = "all",
     }
 
     //arm
-
+    if (part_select == 2 || part_select == 0)
     union()
     {
         difference()
@@ -177,6 +178,7 @@ module jig (    part_select = "all",
     lid_lip = 2;
     lid_gap = 0.25;
 
+    if (part_select == 3 || part_select == 0)
     translate([3*base_radius,0,0]) difference()
     {
         h = vane_offset-arm_offset-(base_height - arrow_offset) + lid_thickness;
