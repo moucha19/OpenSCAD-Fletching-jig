@@ -2,6 +2,13 @@ use <quadratic_bezier.scad>
 use <hinge.scad>
 use <MCAD/regular_shapes.scad>
 
+//Function that creates error messages
+module error_treshold (value_name, treshold_name, value, treshold)
+{
+    if (value == treshold) 
+        echo(str("<font color='red'>", value_name," treshold (", treshold_name, " = ", treshold, ") reached!</font>"));
+}
+
 //
 //Creates helical vane
 //# height - extrusion height
@@ -78,34 +85,57 @@ module jig (    part_select = 0,
     flag_showAll = part_select == 0 ? 0 : 1; 
 
     //tresholds
-    min_vane_offset = (base_height - arrow_offset) + arm_offset + 4;
     min_base_height = 5;
-    max_hinge_width = (3*arrow_diameter)/sqrt(3); //inscribed circle in equilateral triangle formula
+    min_hinge_diameter = 2;
     min_hinge_thickness = 1;
-    max_hinge_thickness = (hinge_width-hinge_pin-hinge_gap)/2;
+    min_hinge_width = 2*min_hinge_thickness+hinge_gap+hinge_pin;
+    max_hinge_width = (3*arrow_diameter)/sqrt(3); //inscribed circle in equilateral triangle formula
+    max_arm_gap = 1.5;
+    min_arrow_diameter = 2;
 
     //input corrections
+    arrow_diameter = abs(arrow_diameter) >= min_arrow_diameter ? abs(arrow_diameter) : min_arrow_diameter;
     base_height = base_height >= min_base_height ? base_height : min_base_height;
-    hinge_depth = abs(hinge_depth) <= base_height ? abs(hinge_depth) : base_height;
-    hinge_diameter = abs(hinge_diameter) <= hinge_depth ? abs(hinge_diameter) : hinge_depth;
+    hinge_depth = abs(hinge_depth) <= base_height 
+                    ? (abs(hinge_depth) >= min_base_height ? abs(hinge_depth) : min_base_height)
+                    : base_height;
+    hinge_diameter = abs(hinge_diameter) <= hinge_depth 
+                        ? (abs(hinge_diameter) >= min_hinge_diameter ? abs(hinge_diameter) : min_hinge_diameter)
+                        : hinge_depth;
     hinge_pin = abs(hinge_pin) <= hinge_diameter ? abs(hinge_pin) : hinge_diameter;
-    hinge_width = abs(hinge_width) <= max_hinge_width ? abs(hinge_width) : max_hinge_width;
-    hinge_thickness = abs(hinge_thickness) >= min_hinge_thickness && abs(hinge_thickness) <= max_hinge_thickness
-                        ? abs(hinge_thickness) : min_hinge_thickness;
-    vane_offset = vane_offset >= min_vane_offset ? vane_offset : min_vane_offset;
+    //TODO Hinge pin also depends on thickness and width
+    hinge_width     = abs(hinge_width) >= min_hinge_width 
+                        ? (abs(hinge_width) <= max_hinge_width ? abs(hinge_width) : max_hinge_width) 
+                        : min_hinge_width;
+    max_hinge_thickness = (hinge_width-hinge_pin-hinge_gap)/2;    //dependent treshold
+    hinge_thickness = abs(hinge_thickness) >= min_hinge_thickness
+                        ? (abs(hinge_thickness) <= max_hinge_thickness ? abs(hinge_thickness) : max_hinge_thickness) 
+                        : min_hinge_thickness;
     arrow_offset = abs(arrow_offset) <= base_height ? abs(arrow_offset) : base_height;
-    arrow_diameter = abs(arrow_diameter);
+    arm_gap = abs(arm_gap) <= max_arm_gap ? arm_gap : max_arm_gap;
     vane_width = abs(vane_width);
     vane_length = abs(vane_length);
     arm_offset = abs(arm_offset);
-    //TODO arm_gap (base_diameter), vane_turn, hinge_width minimum
+    min_vane_offset = (base_height - arrow_offset) + arm_offset + 4;    //dependent treshold
+    vane_offset = vane_offset >= min_vane_offset ? vane_offset : min_vane_offset;
 
     //error report
     echo(str("<font color='blue'>Minimal value for vane_offset with current setup is ", min_vane_offset, "</font>"));
-    if (vane_offset == min_vane_offset) echo(str("<font color='red'>vane_offset treshold (min = ", min_vane_offset, ") reached!</font>"));
-    if (arrow_offset == base_height) echo(str("<font color='red'>arrow_offset treshold (max = ", base_height, ") reached!</font>"));
-    if (hinge_width == max_hinge_width) echo(str("<font color='red'>hinge_width treshold (max = ", max_hinge_width, ") reached!</font>"));
-    if (hinge_thickness == min_hinge_thickness) echo(str("<font color='red'>hinge_thickness treshold (min = ", min_hinge_thickness, ", max = ", max_hinge_thickness, ") reached!</font>"));
+
+    error_treshold ("arrow_diameter", "min", arrow_diameter, min_arrow_diameter);
+    error_treshold ("base_height", "min", base_height, min_base_height);
+    error_treshold ("hinge_depth", "min", hinge_depth, min_base_height);
+    error_treshold ("hinge_diameter", "min", hinge_diameter, min_hinge_diameter);
+    error_treshold ("hinge_diameter", "max", hinge_diameter, hinge_depth);
+    error_treshold ("hinge_pin", "max", hinge_pin, hinge_diameter);
+    error_treshold ("hinge_depth", "max", hinge_depth, base_height);
+    error_treshold ("hinge_width", "min", hinge_width, min_hinge_width);
+    error_treshold ("hinge_width", "max", hinge_width, max_hinge_width);
+    error_treshold ("hinge_thickness", "min", hinge_thickness, min_hinge_thickness);
+    error_treshold ("hinge_thickness", "max", hinge_thickness, max_hinge_thickness);
+    error_treshold ("vane_offset", "min", vane_offset, min_vane_offset);
+    error_treshold ("arrow_offset", "max", arrow_offset, base_height);
+    error_treshold ("arm_gap", "max", abs(arm_gap), max_arm_gap);
 
     //dependent internal variables
     base_diameter = arrow_diameter + 2*hinge_diameter + 2;
@@ -114,6 +144,11 @@ module jig (    part_select = 0,
     hinge_radius = hinge_diameter/2;
     arm_height = vane_length + 2*(vane_offset-arm_offset-(base_height - arrow_offset));
     arm_width = hinge_width + hinge_pin + 3;
+
+    //max vane turn limit calculation
+    max_vane_turn = atan((((arrow_radius+arm_gap)*sqrt(3))/2 - vane_width/2)/(vane_length/2));
+    vane_turn = abs(vane_turn) <= max_vane_turn ? vane_turn : sign(vane_turn)*max_vane_turn;
+    error_treshold ("vane_turn", "max", abs(vane_turn), max_vane_turn);
 
     //base
     if (part_select == 1 || part_select == 0)
@@ -157,6 +192,7 @@ module jig (    part_select = 0,
                 r = arrow_radius+arm_gap-0.35;
                 t = helical_adjust < (r * sqrt(3)) ? helical_adjust : (r * sqrt(3));
                 x = sqrt(pow(r,2) - pow(t,2)/4);
+                error_treshold ("hinge_adjust", "max", t, r * sqrt(3));
                 translate([x,0, vane_length/2 + arrow_offset + vane_offset])
                     helical_vane(width = vane_width, 
                                     length = vane_length, 
