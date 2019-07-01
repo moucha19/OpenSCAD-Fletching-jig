@@ -2,11 +2,15 @@ use <quadratic_bezier.scad>
 use <hinge.scad>
 use <MCAD/regular_shapes.scad>
 
-//Function that creates error messages
+//Functions that create console messages
 module error_treshold (value_name, treshold_name, value, treshold)
 {
     if (value == treshold) 
         echo(str("<font color='red'>", value_name," treshold (", treshold_name, " = ", treshold, ") reached!</font>"));
+}
+module info_treshold (value_name, treshold_name, treshold)
+{
+    echo(str("<font color='blue'>Current ", treshold_name, " for ", value_name, " is ", treshold, "</font>"));
 }
 
 //
@@ -88,7 +92,7 @@ module jig (    part_select = 0,
     min_base_height = 5;
     min_hinge_diameter = 2;
     min_hinge_thickness = 1;
-    min_hinge_width = 2*min_hinge_thickness+hinge_gap+hinge_pin;
+    min_hinge_width = 2*min_hinge_thickness;
     max_hinge_width = (3*arrow_diameter)/sqrt(3); //inscribed circle in equilateral triangle formula
     max_arm_gap = 1.5;
     min_arrow_diameter = 2;
@@ -102,15 +106,16 @@ module jig (    part_select = 0,
     hinge_diameter = abs(hinge_diameter) <= hinge_depth 
                         ? (abs(hinge_diameter) >= min_hinge_diameter ? abs(hinge_diameter) : min_hinge_diameter)
                         : hinge_depth;
-    hinge_pin = abs(hinge_pin) <= hinge_diameter ? abs(hinge_pin) : hinge_diameter;
-    //TODO Hinge pin also depends on thickness and width
     hinge_width     = abs(hinge_width) >= min_hinge_width 
                         ? (abs(hinge_width) <= max_hinge_width ? abs(hinge_width) : max_hinge_width) 
                         : min_hinge_width;
-    max_hinge_thickness = (hinge_width-hinge_pin-hinge_gap)/2;    //dependent treshold
+    max_hinge_thickness = (hinge_width-hinge_gap)/2;    //dependent treshold
     hinge_thickness = abs(hinge_thickness) >= min_hinge_thickness
                         ? (abs(hinge_thickness) <= max_hinge_thickness ? abs(hinge_thickness) : max_hinge_thickness) 
                         : min_hinge_thickness;
+    max_hinge_pin = min(hinge_diameter, hinge_width - hinge_gap - 2*hinge_thickness);//dependent treshold
+    hinge_pin = abs(hinge_pin) <= max_hinge_pin ? abs(hinge_pin) : max_hinge_pin;
+    //TODO Hinge pin also depends on thickness and width
     arrow_offset = abs(arrow_offset) <= base_height ? abs(arrow_offset) : base_height;
     arm_gap = abs(arm_gap) <= max_arm_gap ? arm_gap : max_arm_gap;
     vane_width = abs(vane_width);
@@ -118,24 +123,6 @@ module jig (    part_select = 0,
     arm_offset = abs(arm_offset);
     min_vane_offset = (base_height - arrow_offset) + arm_offset + 4;    //dependent treshold
     vane_offset = vane_offset >= min_vane_offset ? vane_offset : min_vane_offset;
-
-    //error report
-    echo(str("<font color='blue'>Minimal value for vane_offset with current setup is ", min_vane_offset, "</font>"));
-
-    error_treshold ("arrow_diameter", "min", arrow_diameter, min_arrow_diameter);
-    error_treshold ("base_height", "min", base_height, min_base_height);
-    error_treshold ("hinge_depth", "min", hinge_depth, min_base_height);
-    error_treshold ("hinge_diameter", "min", hinge_diameter, min_hinge_diameter);
-    error_treshold ("hinge_diameter", "max", hinge_diameter, hinge_depth);
-    error_treshold ("hinge_pin", "max", hinge_pin, hinge_diameter);
-    error_treshold ("hinge_depth", "max", hinge_depth, base_height);
-    error_treshold ("hinge_width", "min", hinge_width, min_hinge_width);
-    error_treshold ("hinge_width", "max", hinge_width, max_hinge_width);
-    error_treshold ("hinge_thickness", "min", hinge_thickness, min_hinge_thickness);
-    error_treshold ("hinge_thickness", "max", hinge_thickness, max_hinge_thickness);
-    error_treshold ("vane_offset", "min", vane_offset, min_vane_offset);
-    error_treshold ("arrow_offset", "max", arrow_offset, base_height);
-    error_treshold ("arm_gap", "max", abs(arm_gap), max_arm_gap);
 
     //dependent internal variables
     base_diameter = arrow_diameter + 2*hinge_diameter + 2;
@@ -149,6 +136,29 @@ module jig (    part_select = 0,
     max_vane_turn = atan((((arrow_radius+arm_gap)*sqrt(3))/2 - vane_width/2)/(vane_length/2));
     vane_turn = abs(vane_turn) <= max_vane_turn ? vane_turn : sign(vane_turn)*max_vane_turn;
     error_treshold ("vane_turn", "max", abs(vane_turn), max_vane_turn);
+
+    //error report
+    info_treshold ("vane_offset", "minimal value", min_vane_offset);
+    info_treshold ("vane_turn", "maximum angle", max_vane_turn);
+
+    error_treshold ("arrow_diameter", "min", arrow_diameter, min_arrow_diameter);
+    error_treshold ("base_height", "min", base_height, min_base_height);
+    error_treshold ("hinge_depth", "min", hinge_depth, min_base_height);
+    error_treshold ("hinge_diameter", "min", hinge_diameter, min_hinge_diameter);
+    error_treshold ("hinge_diameter", "max", hinge_diameter, hinge_depth);
+    error_treshold ("hinge_depth", "max", hinge_depth, base_height);
+    error_treshold ("hinge_width", "min", hinge_width, min_hinge_width);
+    error_treshold ("hinge_width", "max", hinge_width, max_hinge_width);
+    error_treshold ("hinge_thickness", "min", hinge_thickness, min_hinge_thickness);
+    error_treshold ("hinge_thickness", "max", hinge_thickness, max_hinge_thickness);
+    error_treshold ("hinge_pin", "max", hinge_pin, max_hinge_pin);
+    error_treshold ("vane_offset", "min", vane_offset, min_vane_offset);
+    error_treshold ("arrow_offset", "max", arrow_offset, base_height);
+    error_treshold ("arm_gap", "max", abs(arm_gap), max_arm_gap);
+
+    assert (min_hinge_width <= max_hinge_width && min_hinge_thickness <= max_hinge_thickness,
+            "INVALID HINGE PARAMETERS"
+    );
 
     //base
     if (part_select == 1 || part_select == 0)
