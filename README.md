@@ -1,3 +1,4 @@
+![](./img/icon_80px.png)
 # OpenSCAD Fletching jig
 
 ## Overview
