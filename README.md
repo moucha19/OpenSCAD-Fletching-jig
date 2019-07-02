@@ -30,22 +30,22 @@ Select which part you wish to render by changing part_select and then press *F6*
 
 Parameter | Description | Tresholds
 --- | --- | ---
-arrow_diameter | slightly bigger than the arrow itself (may vary depending on your printer) | 2 < *
-arrow_offset | distance between the bottom of the base and arrow | 0 < * < base_height 
-base_height | height of the base | 5 < *
-hinge_width | width of the hinge cutout on the base | 2.1 < * < *depends on arrow_diameter*
-hinge_thickness | thickness of the hinge extension attached to the bottom of the arm | 1 < * < *depends on hinge_width*
-hinge_diameter | diameter of the circular part of the hinge that forms a joint | 2 < * < hinge_depth
-hinge_depth | how deep into the base is the hinge cutout | 5 < * < base_height
-hinge_pin | diameter of the sphere that connects two halves of the hinge together | 0 < * < min(hinge_diameter, space between hinge extensions)
-arm_gap | gap for the vane foot, so that tension during clamping is distributed evenly | 0 < * < 1.5
-arm_offset | distance between the top of the base and bottom of the arm | 0 < * < 1.5 
-vane_length | length of the vane | 0 < *
-vane_width | width of the vane | 0 < * < **!none!**
-vane_offset | how far from the end of the arrow will the vane be | *in the console* < *
-vane_turn | sets OFFSET fletching in degrees | * < *in the console*
+arrow_diameter | slightly bigger than the arrow itself (may vary depending on your printer) | 2 < ■
+arrow_offset | distance between the bottom of the base and arrow | 0 < ■ < base_height 
+base_height | height of the base | 5 < ■
+hinge_width | width of the hinge cutout on the base | 2.1 < ■ < *depends on arrow_diameter*
+hinge_thickness | thickness of the hinge extension attached to the bottom of the arm | 1 < ■ < *depends on hinge_width*
+hinge_diameter | diameter of the circular part of the hinge that forms a joint | 2 < ■ < hinge_depth
+hinge_depth | how deep into the base is the hinge cutout | 5 < ■ < base_height
+hinge_pin | diameter of the sphere that connects two halves of the hinge together | 0 < ■ < min(hinge_diameter, space between hinge extensions)
+arm_gap | gap for the vane foot, so that tension during clamping is distributed evenly | 0 < ■ < 1.5
+arm_offset | distance between the top of the base and bottom of the arm | 0 < ■ < 1.5 
+vane_length | length of the vane | 0 < ■
+vane_width | width of the vane | 0 < ■ < **!none!**
+vane_offset | how far from the end of the arrow will the vane be | *in the console* < ■
+vane_turn | sets OFFSET fletching in degrees | ■ < *in the console*
 helical | if true, HELICAL fletching will be used | 
-helical_adjust | horizontal distance between the bottom and top corner of the HELICAL vane | 0 < *depends on arrow_diameter*
+helical_adjust | horizontal distance between the bottom and top corner of the HELICAL vane | 0 < ■ < *depends on arrow_diameter*
 helical_direction | sign of the value determines left or right spin (+ left; - right) | 
 
 ![](./img/dimensions_1.png)
