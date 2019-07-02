@@ -20,34 +20,53 @@ Additional software required will vary depending on your 3D printer.
 
 ## How to use
 
-Download and extract latest release somewhere on your PC. Then open [main.scad](./scad/main.scad) file in OpenSCAD. You can close the editor on the left.
+Download and extract [latest release](https://github.com/TheWolftalon/OpenSCAD-Fletching-jig/releases) somewhere on your PC. Then open [main.scad](./scad/main.scad) file in OpenSCAD. You can close the editor on the left.
 
-You should see customizer window on the right. There you can change parameters listed below. Nothing prevents you from inserting invalid values, messing up the design in the process - so be reasonable. I'd advise you to change parameters you're sure about first (arrow_diameter, vane_length etc.) and then adjust the rest.
+You should now see the preview with the customizer window on the right. There you can change parameters listed below. I did all i could to prevent user from inserting invalid values, but there could still be ways to generate completely invalid design - so be reasonable. I'd advise you to change parameters you're sure about first (arrow_diameter, vane_length etc.) and then adjust the rest.
 
-Press *F6* when you're happy with the result and then navigate to *File > Export > Export as STL* to save rendered mesh as a file.
+Select which part you wish to render by changing part_select and then press *F6* when you're happy with the result. Then navigate to *File > Export > Export as STL* to save rendered mesh as a file.
 
-Parameter | Description
---- | ---
-arrow_diameter | slightly bigger than the arrow itself (may vary depending on your printer)
-arrow_offset | distance between the bottom of the base and arrow
-base_height | height of the base
-hinge_width | width of the hinge cutout on the base
-hinge_thickness | thickness of the hinge extension attached to the bottom of the arm
-hinge_diameter | diameter of the circular part of the hinge that forms a joint
-hinge_depth | how deep into the base is the hinge cutout
-hinge_pin | diameter of the sphere that connects two halves of the hinge together 
-arm_gap | gap for the vane foot, so that tension during clamping is distributed evenly
-arm_offset | distance between the top of the base and bottom of the arm
-vane_length | length of the vane
-vane_width | width of the vane
-vane_offset | how far from the end of the arrow will the vane be
-vane_turn | sets OFFSET fletching in degrees
-helical | if true, HELICAL fletching will be used
-helical_adjust | horizontal distance between the bottom and top corner of the HELICAL vane
-helical_direction | sign of the value determines left or right spin (+ left; - right)
+### Parameters
+
+Parameter | Description | Tresholds
+--- | --- | ---
+arrow_diameter | slightly bigger than the arrow itself (may vary depending on your printer) | 2 < *
+arrow_offset | distance between the bottom of the base and arrow | 0 < * < base_height 
+base_height | height of the base | 5 < *
+hinge_width | width of the hinge cutout on the base | 2.1 < * < *depends on arrow_diameter*
+hinge_thickness | thickness of the hinge extension attached to the bottom of the arm | 1 < * < *depends on hinge_width*
+hinge_diameter | diameter of the circular part of the hinge that forms a joint | 2 < * < hinge_depth
+hinge_depth | how deep into the base is the hinge cutout | 5 < * < base_height
+hinge_pin | diameter of the sphere that connects two halves of the hinge together | 0 < * < min(hinge_diameter, space between hinge extensions)
+arm_gap | gap for the vane foot, so that tension during clamping is distributed evenly | 0 < * < 1.5
+arm_offset | distance between the top of the base and bottom of the arm | 0 < * < 1.5 
+vane_length | length of the vane | 0 < *
+vane_width | width of the vane | 0 < * < **!none!**
+vane_offset | how far from the end of the arrow will the vane be | *in the console* < *
+vane_turn | sets OFFSET fletching in degrees | * < *in the console*
+helical | if true, HELICAL fletching will be used | 
+helical_adjust | horizontal distance between the bottom and top corner of the HELICAL vane | 0 < *depends on arrow_diameter*
+helical_direction | sign of the value determines left or right spin (+ left; - right) | 
 
 ![](./img/dimensions_1.png)
 ![](./img/dimensions_2.png)
+
+### Tresholds
+
+Like I already mentioned, I've take some precautions to ensure a valid outputs.
+
+First are constrained sliders in customizer. These are set to accommodate even extreme values and should be sufficient for everyone. They're nothing more than recommendations though and even values beyond their range should work just fine. If - for any reason - you'd want to allow them, you can do so in main.scad by editing lines just like this one:
+```openscad
+//distance between the bottom of the base and arrow
+arrow_offset = 3;//[0:0.1:100] 
+```
+where comment behind the assignment means *[min:precision:max]*. Go to [customizer documentation](https://customizer.makerbot.com/docs) for more information.
+
+Second are tresholds in the module itself that are actually checking if desired parameters make sense or not. For example, if you have small jig for 6mm arrows, you can't have 10 centimeter wide hinge. So even if you're able to set something like this in the customizer, invalid parameters will be truncated in the module to a closest valid value. If this happens, you'll be informed about it in the console window with similiar line:
+> <font color='red'>hinge_thickness treshold (max = 5.25) reached! </font>
+
+List of these tresholds is in the table above. Note that extreme values in helical_adjust and vane_width can still produce invalid results. Fixing this is more trouble than it's worth so I'm not gonna do it :D. There might be more issues like that, so if you encounter anything weird, definitely report it.
+
 
 ## Printing recommendations
 
