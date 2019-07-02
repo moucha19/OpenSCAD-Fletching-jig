@@ -1,7 +1,7 @@
 {
     "parameterSets": {
         "6 mm - straight": {
-            "$fn": "10",
+            "$fn": "50",
             "arm_gap": "0.5",
             "arm_offset": "1.5",
             "arrow_diameter": "6",
@@ -20,7 +20,7 @@
             "vane_width": "1.1"
         },
         "6 mm - helical\/right\/3.5": {
-            "$fn": "10",
+            "$fn": "50",
             "arm_gap": "0.5",
             "arm_offset": "1.5",
             "arrow_diameter": "6",
@@ -39,7 +39,7 @@
             "vane_width": "1.1"
         },
         "8 mm - helical\/right\/3.5": {
-            "$fn": "10",
+            "$fn": "50",
             "arm_gap": "0.5",
             "arm_offset": "1.5",
             "arrow_diameter": "8",
