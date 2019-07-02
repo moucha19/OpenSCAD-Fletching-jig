@@ -88,40 +88,49 @@ module jig (    part_select = 0,
     hinge_gap = 0.1;
     flag_showAll = part_select == 0 ? 0 : 1; 
 
-    //tresholds
-    min_base_height = 5;
-    min_hinge_diameter = 2;
-    min_hinge_thickness = 1;
-    min_hinge_width = 2*min_hinge_thickness + hinge_gap;
-    max_hinge_width = (3*arrow_diameter)/sqrt(3); //inscribed circle in equilateral triangle formula
-    max_arm_gap = 1.5;
+    //input corrections and tresholds
     min_arrow_diameter = 2;
-
-    //input corrections
     arrow_diameter = abs(arrow_diameter) >= min_arrow_diameter ? abs(arrow_diameter) : min_arrow_diameter;
+
+    min_base_height = 5;
     base_height = base_height >= min_base_height ? base_height : min_base_height;
+
     hinge_depth = abs(hinge_depth) <= base_height 
                     ? (abs(hinge_depth) >= min_base_height ? abs(hinge_depth) : min_base_height)
                     : base_height;
+    
+    min_hinge_diameter = 2;
     hinge_diameter = abs(hinge_diameter) <= hinge_depth 
                         ? (abs(hinge_diameter) >= min_hinge_diameter ? abs(hinge_diameter) : min_hinge_diameter)
                         : hinge_depth;
-    hinge_width     = abs(hinge_width) >= min_hinge_width 
-                        ? (abs(hinge_width) <= max_hinge_width ? abs(hinge_width) : max_hinge_width) 
-                        : min_hinge_width;
-    max_hinge_thickness = (hinge_width-hinge_gap)/2;    //dependent treshold
+    
+    min_hinge_thickness = 1;
+    max_hinge_thickness = (hinge_width-hinge_gap)/2;
     hinge_thickness = abs(hinge_thickness) >= min_hinge_thickness
                         ? (abs(hinge_thickness) <= max_hinge_thickness ? abs(hinge_thickness) : max_hinge_thickness) 
                         : min_hinge_thickness;
-    max_hinge_pin = min(hinge_diameter, hinge_width - hinge_gap - 2*hinge_thickness);//dependent treshold
+
+    min_hinge_width = 2*min_hinge_thickness + hinge_gap;
+    max_hinge_width = (3*arrow_diameter)/sqrt(3); //inscribed circle in equilateral triangle formula
+    hinge_width     = abs(hinge_width) >= min_hinge_width 
+                        ? (abs(hinge_width) <= max_hinge_width ? abs(hinge_width) : max_hinge_width) 
+                        : min_hinge_width;
+
+    max_hinge_pin = min(hinge_diameter, hinge_width - hinge_gap - 2*hinge_thickness);
     hinge_pin = abs(hinge_pin) <= max_hinge_pin ? abs(hinge_pin) : max_hinge_pin;
-    //TODO Hinge pin also depends on thickness and width
+
     arrow_offset = abs(arrow_offset) <= base_height ? abs(arrow_offset) : base_height;
+
+    max_arm_gap = 1.5;
     arm_gap = abs(arm_gap) <= max_arm_gap ? arm_gap : max_arm_gap;
+
     vane_width = abs(vane_width);
+
     vane_length = abs(vane_length);
+
     arm_offset = abs(arm_offset);
-    min_vane_offset = (base_height - arrow_offset) + arm_offset + 4;    //dependent treshold
+
+    min_vane_offset = (base_height - arrow_offset) + arm_offset + 4;  
     vane_offset = vane_offset >= min_vane_offset ? vane_offset : min_vane_offset;
 
     //dependent internal variables
@@ -147,10 +156,10 @@ module jig (    part_select = 0,
     error_treshold ("hinge_diameter", "min", hinge_diameter, min_hinge_diameter);
     error_treshold ("hinge_diameter", "max", hinge_diameter, hinge_depth);
     error_treshold ("hinge_depth", "max", hinge_depth, base_height);
-    error_treshold ("hinge_width", "min", hinge_width, min_hinge_width);
-    error_treshold ("hinge_width", "max", hinge_width, max_hinge_width);
     error_treshold ("hinge_thickness", "min", hinge_thickness, min_hinge_thickness);
     error_treshold ("hinge_thickness", "max", hinge_thickness, max_hinge_thickness);
+    error_treshold ("hinge_width", "min", hinge_width, min_hinge_width);
+    error_treshold ("hinge_width", "max", hinge_width, max_hinge_width);
     error_treshold ("hinge_pin", "max", hinge_pin, max_hinge_pin);
     error_treshold ("vane_offset", "min", vane_offset, min_vane_offset);
     error_treshold ("arrow_offset", "max", arrow_offset, base_height);

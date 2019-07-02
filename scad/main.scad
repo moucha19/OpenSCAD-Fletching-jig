@@ -7,12 +7,12 @@ part_select = 0; //[0:All, 1:Base only, 2:Arm only, 3:Lid only]
 
 /* [Jig settings] */
 
-arrow_diameter = 6; 
+arrow_diameter = 6;//[2:0.1:30] 
 
 //distance between the bottom of the base and arrow
-arrow_offset = 3;
+arrow_offset = 3;//[0:0.1:100] 
 
-base_height = 20;
+base_height = 20;//[0:0.1:100]
 
 hinge_width = 6.5;//[0:0.1:30]  
 
@@ -20,28 +20,28 @@ hinge_width = 6.5;//[0:0.1:30]
 hinge_thickness = 1.5;
 
 //diameter of the hinge's circular part
-hinge_diameter = 5;
+hinge_diameter = 5.1;
 
 //how deep into base is the hinge cutout
-hinge_depth = 10;
+hinge_depth = 10.1;
 
 //diameter of the sphere that connects two halves of the hinge together 
-hinge_pin = 3;
+hinge_pin = 3.1;
 
 //gap for the vane foot
-arm_gap = 0.5;//[0:0.1:5]     
+arm_gap = 0.5;     
 
 //distance between the top of the base and bottom of the arm
 arm_offset = 1.5;
 
 /* [Fletching] */
 
-vane_length = 72; 
+vane_length = 72.1;//[0:0.1:200] 
 
-vane_width = 1.1; 
+vane_width = 1.1;//[0:0.1:10] 
 
 //how far from the end of arrow will the vane be
-vane_offset = 25;
+vane_offset = 25.1;//[0:0.1:200] 
 
 //sets offset fletching in degrees
 vane_turn = 0;// [-30:0.1:30]
