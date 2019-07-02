@@ -103,18 +103,18 @@ module jig (    part_select = 0,
     hinge_diameter = abs(hinge_diameter) <= hinge_depth 
                         ? (abs(hinge_diameter) >= min_hinge_diameter ? abs(hinge_diameter) : min_hinge_diameter)
                         : hinge_depth;
-    
-    min_hinge_thickness = 1;
-    max_hinge_thickness = (hinge_width-hinge_gap)/2;
-    hinge_thickness = abs(hinge_thickness) >= min_hinge_thickness
-                        ? (abs(hinge_thickness) <= max_hinge_thickness ? abs(hinge_thickness) : max_hinge_thickness) 
-                        : min_hinge_thickness;
 
+    min_hinge_thickness = 1;
     min_hinge_width = 2*min_hinge_thickness + hinge_gap;
     max_hinge_width = (3*arrow_diameter)/sqrt(3); //inscribed circle in equilateral triangle formula
     hinge_width     = abs(hinge_width) >= min_hinge_width 
                         ? (abs(hinge_width) <= max_hinge_width ? abs(hinge_width) : max_hinge_width) 
                         : min_hinge_width;
+
+    max_hinge_thickness = (hinge_width-hinge_gap)/2;
+    hinge_thickness = abs(hinge_thickness) >= min_hinge_thickness
+                        ? (abs(hinge_thickness) <= max_hinge_thickness ? abs(hinge_thickness) : max_hinge_thickness) 
+                        : min_hinge_thickness;
 
     max_hinge_pin = min(hinge_diameter, hinge_width - hinge_gap - 2*hinge_thickness);
     hinge_pin = abs(hinge_pin) <= max_hinge_pin ? abs(hinge_pin) : max_hinge_pin;
@@ -156,10 +156,10 @@ module jig (    part_select = 0,
     error_treshold ("hinge_diameter", "min", hinge_diameter, min_hinge_diameter);
     error_treshold ("hinge_diameter", "max", hinge_diameter, hinge_depth);
     error_treshold ("hinge_depth", "max", hinge_depth, base_height);
-    error_treshold ("hinge_thickness", "min", hinge_thickness, min_hinge_thickness);
-    error_treshold ("hinge_thickness", "max", hinge_thickness, max_hinge_thickness);
     error_treshold ("hinge_width", "min", hinge_width, min_hinge_width);
     error_treshold ("hinge_width", "max", hinge_width, max_hinge_width);
+    error_treshold ("hinge_thickness", "min", hinge_thickness, min_hinge_thickness);
+    error_treshold ("hinge_thickness", "max", hinge_thickness, max_hinge_thickness);
     error_treshold ("hinge_pin", "max", hinge_pin, max_hinge_pin);
     error_treshold ("vane_offset", "min", vane_offset, min_vane_offset);
     error_treshold ("arrow_offset", "max", arrow_offset, base_height);
