@@ -211,7 +211,7 @@ module jig (    part_select = 0,
                 r = arrow_radius+arm_gap-0.35;
                 t = helical_adjust < (r * sqrt(3)) ? helical_adjust : (r * sqrt(3));
                 x = sqrt(pow(r,2) - pow(t,2)/4);
-                error_treshold ("hinge_adjust", "max", t, r * sqrt(3));
+                error_treshold ("helical_adjust", "max", t, r * sqrt(3));
                 translate([x,0, vane_length/2 + arrow_offset + vane_offset])
                     helical_vane(width = vane_width, 
                                     length = vane_length, 
