@@ -63,6 +63,13 @@ module base_mold (a = 8, radius = 15, height = 20)
     }
 }
 
+// Polyhole compensated cylinder for correct fit 
+// https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/undersized_circular_objects
+module cylinder_outer(height = 1,radius = 1,fn = 30){
+   fudge = 1/cos(180/fn);
+   cylinder(h=height,r=radius*fudge,$fn=fn);
+}
+
 //
 //All three main components of the jig are created here - arm, base and clamping lid
 //# arrow_diameter - slightly bigger than the arrow itself (may vary depending on your printer)
@@ -100,7 +107,8 @@ module jig (    part_select = 0,
                 vane_turn = 0,
                 helical = false,
                 helical_adjust = 3.5,
-                helical_direction = 1
+                helical_direction = 1,
+                fn = 30
              ) 
 {
     //independent internal variables
@@ -193,7 +201,8 @@ module jig (    part_select = 0,
     difference()
     {
         base_mold(a = arm_width, radius = base_radius, height = base_height);
-        translate([0,0,arrow_offset]) cylinder(base_height,d=arrow_diameter, true);
+        //translate([0,0,arrow_offset]) cylinder(base_height,d=arrow_diameter, true);
+        translate([0,0,arrow_offset]) cylinder_outer(height = base_height,radius = arrow_diameter/2,fn = fn);
         //hinge holer
         for (i = [0:2]) 
         {
