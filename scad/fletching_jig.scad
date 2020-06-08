@@ -19,14 +19,33 @@ module info_treshold (value_name, treshold_name, treshold)
 //# spread - horizontal distance between edges of the vane
 //# direction - sign of the value determines left or right spin (+ left; - right)
 //
+//helical_vane (width = 1, length = 75, height = 10, spread = 4, direction = 1);
 module helical_vane (width = 1, length = 75, height = 10, spread = 4, direction = 1)
 {
+    %bezier([0,-direction*spread],[0.5*length,-direction*spread],[length,direction*spread],width);
     direction = sign(direction);
     length = length - width;
     rotate([0,90,0])
         linear_extrude(height, center = false, twist = -direction*15, scale = 1)
             translate([-length/2,0,0])
                 bezier([0,-direction*spread],[0.5*length,-direction*spread],[length,direction*spread],width);
+}
+
+//screw_vane (width = 1, length = 75, height = 10, vane_turn = 4, direction = 1);
+// Create linear screw type of helical vane
+module screw_vane (width = 1, length = 75, height = 10, vane_turn = 3, direction = 1)
+{
+    resolution = 2;
+    rotate([0,0,vane_turn/2])
+    for(i = [0 : resolution : length-resolution]) {
+        a = i*vane_turn/length * direction;
+        a1 = (i+1)*vane_turn/length * direction;
+        hull() {
+            translate([0,-width/2,length/2-i]) rotate([0,0,a]) cube([height, width, 0.1]);
+            translate([0,-width/2,length/2-i-resolution]) rotate([0,0,a1]) cube([height, width, 0.1]);
+        }
+    }
+
 }
 
 //
@@ -203,7 +222,7 @@ module jig (    part_select = 0,
             translate([0,0,base_height]) 
                 cylinder(arm_height + base_height,d=arrow_diameter, true);
             //vane
-            if (helical)
+            if (helical == 1)
             {
                 //r - radius of arrow + gap for vane foot - correction
                 //t - values from 0 to maximum spread (side of equilateral triangle in circumscribed cirle)
@@ -213,10 +232,27 @@ module jig (    part_select = 0,
                 x = sqrt(pow(r,2) - pow(t,2)/4);
                 error_treshold ("hinge_adjust", "max", t, r * sqrt(3));
                 translate([x,0, vane_length/2 + arrow_offset + vane_offset])
-                    helical_vane(width = vane_width, 
-                                    length = vane_length, 
-                                    height = base_diameter, 
-                                    spread = t/2 - vane_width/2,                            
+                    helical_vane(width = vane_width,
+                                    length = vane_length,
+                                    height = base_diameter,
+                                    spread = t/2 - vane_width/2,
+                                    direction = helical_direction);
+            }
+            else if (helical == 2)
+            {
+                // screw type twist
+                //r - radius of arrow + gap for vane foot - correction
+                //t - values from 0 to maximum spread (side of equilateral triangle in circumscribed cirle)
+                //x - distance from center to arm based on t
+                r = arrow_radius+arm_gap-0.35;
+                t = helical_adjust < (r * sqrt(3)) ? helical_adjust : (r * sqrt(3));
+                x = sqrt(pow(r,2) - pow(t,2)/4);
+                error_treshold ("hinge_adjust", "max", t, r * sqrt(3));
+                translate([0,0, vane_length/2 + arrow_offset + vane_offset])
+                    screw_vane(width = vane_width,
+                                    length = vane_length,
+                                    height = base_diameter,
+                                    vane_turn = helical_adjust,
                                     direction = helical_direction);
             }
             else
