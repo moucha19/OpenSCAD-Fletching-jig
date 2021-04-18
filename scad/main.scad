@@ -43,12 +43,11 @@ vane_width = 1.1;//[0:0.1:10]
 //how far from the end of arrow will the vane be
 vane_offset = 25.1;//[0:0.1:200] 
 
+//select vane style
+helical = 0;//[0:Offset, 1:Helical]
+
 //sets offset fletching in degrees
 vane_turn = 0;// [-30:0.1:30]
-
-//if true, helical fletching will be used
-//helical = false;
-helical = 0;//[0:Offset, 1:helical, 2:screw, 3:screw_exp]
 
 //horizontal distance between the bottom and top corner of the helical vane
 helical_adjust = 3.5; //[0:0.1:40]
