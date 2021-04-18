@@ -3,7 +3,12 @@ use <fletching_jig.scad>
 
 // Quality of the generated round elements of the jig. Higher values will generate more polygons, smoother surfaces and slow down the computations.
 $fn=30; // [10:10:100]
-part_select = 0; //[0:All, 1:Base only, 2:Arm only, 3:Lid only]
+// Select which part of the jig you want to show
+part_select_gui = 0; //[0:All, 1:Base only, 2:Arm only, 3:Lid only]
+
+/* [Hidden] */
+part_select_cmd = -1;
+part_select = part_select_cmd < 0 ? part_select_gui : part_select_cmd;
 
 /* [Jig settings] */
 
@@ -59,6 +64,14 @@ helical_adjust = 3.5; //[0:0.1:30]
 
 // Direction of the helical fletching and thus the arrow spin direction.
 helical_direction = 1;//[1:left, -1:right]
+
+// Verbose info for command line rendering
+if (part_select_cmd != -1)
+{
+    echo(str("Selected part = ", part_select));
+    echo(str("Arrow diameter = ", arrow_diameter));
+    echo(str("Vane turn style = ", helical == 1 ? "Helical" : "Offset"));
+}
 
 jig (
         part_select,
