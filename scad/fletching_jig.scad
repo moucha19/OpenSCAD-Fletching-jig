@@ -22,7 +22,6 @@ module info_treshold (value_name, treshold_name, treshold)
 //helical_vane (width = 1, length = 75, height = 10, spread = 4, direction = 1);
 module helical_vane (width = 1, length = 75, height = 10, spread = 4, direction = 1)
 {
-    %bezier([0,-direction*spread],[0.5*length,-direction*spread],[length,direction*spread],width);
     direction = sign(direction);
     length = length - width;
     rotate([0,90,0])
