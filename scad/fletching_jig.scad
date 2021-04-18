@@ -19,12 +19,12 @@ module info_treshold (value_name, treshold_name, treshold)
 //# spread - horizontal distance between edges of the vane
 //# direction - sign of the value determines left or right spin (+ left; - right)
 //
-module helical_vane (width = 1, length = 75, height = 10, spread = 4, direction = 1)
+module helical_vane (width = 1, length = 75, height = 10, spread = 4, twist = 15, direction = 1)
 {
     direction = sign(direction);
     length = length - width;
     rotate([0,90,0])
-        linear_extrude(height, center = false, twist = -direction*15, scale = 1)
+        linear_extrude(height, center = false, twist = -direction*twist, scale = 1)
             translate([-length/2,0,0])
                 bezier([0,-direction*spread],[0.5*length,-direction*spread],[length,direction*spread],width);
 }
@@ -42,6 +42,13 @@ module base_mold (a = 8, radius = 15, height = 20)
                 cube([radius, a, height], false);
         }
     }
+}
+
+// Polyhole compensated cylinder (that cut's hole for the arrow into the base) for correct fit 
+// https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/undersized_circular_objects
+module cylinder_holer(height = 1,radius = 1,fn = 30){
+   fudge = 1/cos(180/fn);
+   cylinder(h=height,r=radius*fudge,$fn=fn);
 }
 
 //
@@ -81,7 +88,8 @@ module jig (    part_select = 0,
                 vane_turn = 0,
                 helical = false,
                 helical_adjust = 3.5,
-                helical_direction = 1
+                helical_direction = 1,
+                fn = 30
              ) 
 {
     //independent internal variables
@@ -174,7 +182,7 @@ module jig (    part_select = 0,
     difference()
     {
         base_mold(a = arm_width, radius = base_radius, height = base_height);
-        translate([0,0,arrow_offset]) cylinder(base_height,d=arrow_diameter, true);
+        translate([0,0,arrow_offset]) cylinder_holer(height = base_height,radius = arrow_diameter/2,fn = fn);
         //hinge holer
         for (i = [0:2]) 
         {
@@ -203,28 +211,33 @@ module jig (    part_select = 0,
             translate([0,0,base_height]) 
                 cylinder(arm_height + base_height,d=arrow_diameter, true);
             //vane
-            if (helical)
-            {
-                //r - radius of arrow + gap for vane foot - correction
-                //t - values from 0 to maximum spread (side of equilateral triangle in circumscribed cirle)
-                //x - distance from center to arm based on t
-                r = arrow_radius+arm_gap-0.35;
-                t = helical_adjust < (r * sqrt(3)) ? helical_adjust : (r * sqrt(3));
-                x = sqrt(pow(r,2) - pow(t,2)/4);
-                error_treshold ("helical_adjust", "max", t, r * sqrt(3));
-                translate([x,0, vane_length/2 + arrow_offset + vane_offset])
-                    helical_vane(width = vane_width, 
-                                    length = vane_length, 
-                                    height = base_diameter, 
-                                    spread = t/2 - vane_width/2,                            
-                                    direction = helical_direction);
-            }
-            else
+            if (helical == 0)
             {
                 translate([base_radius/2,0, vane_length/2 + arrow_offset + vane_offset])
                     rotate([vane_turn,0,0])
                         cube([base_radius, vane_width, vane_length], true);
             }
+            else
+            {
+                //r - radius of arrow + gap for vane foot - correction
+                //t - values from 0 to maximum spread (side of equilateral triangle in circumscribed cirle)
+                //x - distance from center to arm based on t
+                r = arrow_radius+arm_gap-0.35;
+                t = helical_adjust < (r * sqrt(3)) ? helical_adjust/2 : (r * sqrt(3))/2;
+                x = sqrt(pow(r,2) - pow(t*2,2)/4);
+                t_outer = (base_radius)*(t/x);
+                twist = 2*(atan(t_outer/vane_length/2) - atan(t/vane_length/2));
+
+                error_treshold ("helical_adjust", "max", t*2, r * sqrt(3));
+                translate([x,0, vane_length/2 + arrow_offset + vane_offset])
+                    helical_vane(width = vane_width,
+                                    length = vane_length,
+                                    height = base_radius - x + 0.01,
+                                    spread = t - vane_width/2,
+                                    twist = twist,
+                                    direction = helical_direction);
+            }
+
             //vane foot cutout
             translate([0,0,arrow_offset + vane_offset]) cylinder(vane_length,r=arrow_radius + arm_gap, true);
             minkowski()

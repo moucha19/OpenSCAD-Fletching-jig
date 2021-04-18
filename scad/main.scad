@@ -13,7 +13,7 @@ arrow_diameter = 6;//[2:0.1:30]
 // Distance between the bottom of the base and arrow. A smaller offset will restrict the vane offset as the arrow will be deeper into the base.
 arrow_offset = 3;//[0:0.1:100]
 
-// Height of the base itself.
+// Height of the base.
 base_height = 20;//[0:0.1:100]
 
 // Width of the hinge cutout on the base. The maximum value will depend on the arrow diameter.
@@ -34,25 +34,25 @@ hinge_pin = 3.1;
 // Gap for the vane foot in the arm so that the tension is distributed evenly on the vanes during clamping. This value will depend on your vanes. A value too small will clamp unevenly, a value too large will not clamp the vane.
 arm_gap = 0.5;
 
-// Distance between the top of the base and bottom of the arm. This value needs to be adapted to your printer precision so that the arms don't collide with the base.
+// Distance between the top of the base and bottom of the arm.
 arm_offset = 1.5;//[0.1:0.1:2]
 
 /* [Fletching] */
 
-// Length of the vane itself measured in the largest dimension.
+// Length of the vane.
 vane_length = 72.1;//[0:0.1:200]
 
-// Width of the vane excluding the base.
+// Width of the vane.
 vane_width = 1.1;//[0:0.1:10]
 
 // How far from the end of arrow will the vane be. The minimal value will depend on the arrow offset, the base height and the arm offset.
 vane_offset = 25.1;//[0:0.1:200]
 
-// Offset of the fletching in degrees. The maximum value will depend on the arrow radius, the fletching width, the fletching length as well as the arm gap. This value is not used if the helical option is chosen.
-vane_turn = 0;// [-30:0.1:30]
+//Select vane style
+helical = 0;//[0:Offset, 1:Helical]
 
-// If true, helical fletching will be used
-helical = false;
+// Offset of the fletching in degrees. The maximum value will depend on the arrow radius, the fletching width, the fletching length as well as the arm gap. This value is ignored if the helical option is chosen.
+vane_turn = 0;// [-30:0.1:30]
 
 // Horizontal distance between the bottom and top corner of the helical vane. This value is only used if helical fletching is enabled. The maximum value depends on the arrow radius and the arm gap.
 helical_adjust = 3.5; //[0:0.1:30]
@@ -80,4 +80,3 @@ jig (
         helical_adjust,
         helical_direction
     );
-
