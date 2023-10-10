@@ -33,8 +33,11 @@ hinge_diameter = 5.1;
 // How deep into base is the hinge cutout. The maximum value is the base height. Smaller values will be harder to assemble as the arms will be less flexible.
 hinge_depth = 10.1;
 
-// Diameter of the sphere that connects two halves of the hinge together. Maximum depends on both the hinge diameter and the space between hinge extensions. Larger values will provide more strength to the pivot. Smaller values will be easier to pop into place when assembling.
+// Diameter of the sphere that pivots the halves of the hinge. Maximum depends on both the hinge diameter and the space between hinge extensions. Larger values will provide more strength to the pivot. Smaller values will be easier to pop into place when assembling. See hinge holes below.
 hinge_pin = 3.1;
+
+// Makes holes for a pin or bolt rather than a sphere pivot for the hinge. You can use a bit of filament as the pin. If so, recommend hinge_pin 1.9 for 1.75mm filament
+hinge_holes = false;
 
 // Gap for the vane foot in the arm so that the tension is distributed evenly on the vanes during clamping. This value will depend on your vanes. A value too small will clamp unevenly, a value too large will not clamp the vane.
 arm_gap = 0.5;
@@ -74,11 +77,9 @@ helical_adjust = 3.5; //[0:0.1:30]
 // Direction of the helical fletching and thus the arrow spin direction.
 helical_direction = 1;//[1:left, -1:right]
 
-// Whether the base (and lid) had joined up edges. Non joined edges are better for putting pins though the hinges rather than having rotational spheres
+// Whether the base (and lid) have joined up edges making hexagon like shape not tricorn. Tricorn shape is better for using hinge pins or screws. 
 hulled_base = false;
 
-// Makes holes for a pin or bolt rather than a sphere pivot for the hinge
-hinge_holes = false;
 
 
 // Verbose info for command line rendering
