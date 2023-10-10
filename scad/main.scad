@@ -65,6 +65,13 @@ helical_adjust = 3.5; //[0:0.1:30]
 // Direction of the helical fletching and thus the arrow spin direction.
 helical_direction = 1;//[1:left, -1:right]
 
+// Whether the base (and lid) had joined up edges. Non joined edges are better for putting pins though the hinges rather than having rotational spheres
+hulled_base = false;
+
+// Makes holes for a pin or bolt rather than a sphere pivot for the hinge
+hinge_holes = false;
+
+
 // Verbose info for command line rendering
 if (part_select_cmd != -1)
 {
@@ -91,5 +98,7 @@ jig (
         vane_turn,
         helical,
         helical_adjust,
-        helical_direction
+        helical_direction,
+        hulled_base,
+        hinge_holes
     );

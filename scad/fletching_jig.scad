@@ -32,16 +32,18 @@ module helical_vane (width = 1, length = 75, height = 10, spread = 4, twist = 15
 //
 //Creates basic shape of the jig's base
 //
-module base_mold (a = 8, radius = 15, height = 20)
-{
-    hull()
-    { 
-        for (i = [0:2]) 
+module base_mold (a = 8, radius = 15, height = 20, hulled=false) {
+    module base_triangle(a, radius, height){ 
+        for (i = [0:3]) 
         {
             rotate(a=[0,0,i*120]) translate([0,-a/2,0]) 
                 cube([radius, a, height], false);
         }
     }
+    if (hulled)
+      hull() base_triangle(a, radius, height);
+    else
+      base_triangle(a, radius, height);
 }
 
 // Polyhole compensated cylinder (that cut's hole for the arrow into the base) for correct fit 
@@ -89,6 +91,8 @@ module jig (    part_select = 0,
                 helical = false,
                 helical_adjust = 3.5,
                 helical_direction = 1,
+                hulled_base = false,
+                hinge_holes = false,
                 fn = 30
              ) 
 {
@@ -181,14 +185,14 @@ module jig (    part_select = 0,
     if (part_select == 1 || part_select == 0)
     difference()
     {
-        base_mold(a = arm_width, radius = base_radius, height = base_height);
+        base_mold(a = arm_width, radius = base_radius, height = base_height, hulled=hulled_base);
         translate([0,0,arrow_offset]) cylinder_holer(height = base_height,radius = arrow_diameter/2,fn = fn);
         //hinge holer
         for (i = [0:2]) 
         {
             rotate(a=[0,0,i*120]) 
                 translate([(base_radius) - hinge_radius, 0, base_height - hinge_depth + hinge_radius]) 
-                        hinge (hinge_width, hinge_thickness, hinge_diameter, hinge_depth + arm_offset - hinge_radius, hinge_pin, true);
+                        hinge (hinge_width, hinge_thickness, hinge_diameter, hinge_depth + arm_offset - hinge_radius, hinge_pin, true, hinge_holes);
         }
     }
 
@@ -252,7 +256,7 @@ module jig (    part_select = 0,
             }
         }
         translate([base_radius - hinge_radius, 0, base_height - hinge_depth + hinge_radius]) 
-                            hinge(hinge_width - hinge_gap, hinge_thickness, hinge_diameter - hinge_gap, hinge_depth + arm_offset - hinge_radius, hinge_pin - hinge_gap, false);
+            hinge(hinge_width - hinge_gap, hinge_thickness, hinge_diameter - hinge_gap, hinge_depth + arm_offset - hinge_radius, hinge_pin - hinge_gap, false, hinge_holes);
     }
 
     //lid
@@ -268,8 +272,8 @@ module jig (    part_select = 0,
         h = vane_offset-arm_offset-(base_height - arrow_offset) + lid_thickness;
         w = arm_width + lid_gap;
         r = base_radius + lid_gap;
-        base_mold(a = w + lid_thickness, radius = r + lid_thickness, height = h);
-        translate([0,0,lid_thickness] )base_mold(a = w, radius = r, height = h);
-        base_mold(a = w - lid_lip, radius = r - lid_lip, height = h);
+        base_mold(a = w + lid_thickness, radius = r + lid_thickness, height = h, hulled=hulled_base);
+        translate([0,0,lid_thickness] )base_mold(a = w, radius = r, height = h, hulled=hulled_base);
+        base_mold(a = w - lid_lip, radius = r - lid_lip, height = h, hulled=hulled_base);
     }
 }
