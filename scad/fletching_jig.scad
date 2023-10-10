@@ -216,7 +216,7 @@ module jig (    part_select = 0,
     );
 
     //base
-    if (part_select == 1 || part_select == 0)
+    if (part_select == 1 || part_select == 0 || part_select == 4)
     union()
     {
         difference()
@@ -303,8 +303,8 @@ module jig (    part_select = 0,
     lid_lip = 2;
     lid_gap = 0.25;
 
-    if (part_select == 3 || part_select == 0)
-        translate((flag_showAll-1)*[3*base_radius,0,0]) 
+    if (part_select == 3 || part_select == 0 || part_select == 4)
+        translate([-3*base_radius,0,0]) 
     difference()
     {
         h = vane_offset-arm_offset-(base_height - arrow_offset) + lid_thickness;

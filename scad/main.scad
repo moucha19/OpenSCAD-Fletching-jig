@@ -4,7 +4,7 @@ use <fletching_jig.scad>
 // Quality of the generated round elements of the jig. Higher values will generate more polygons, smoother surfaces and slow down the computations.
 $fn=30; // [10:10:100]
 // Select which part of the jig you want to show
-part_select_gui = 0; //[0:All, 1:Base only, 2:Arm only, 3:Lid only]
+part_select_gui = 0; //[0:All, 1:Base only, 2:Arm only, 3:Lid only, 4:Base+Lid]
 
 /* [Hidden] */
 part_select_cmd = -1;
