@@ -63,6 +63,7 @@ module cylinder_holer(height = 1,radius = 1,fn = 30){
 //# hinge_diameter - diameter of the circular part of the hinge that forms a joint
 //# hinge_depth - how deep into the base is the hinge cutout
 //# hinge_pin - diameter of the sphere that connects two halves of the hinge together 
+//# hinge_holes - make a hole rather than sphere so you can put a pin through to hold the hinge together
 //# arm_gap - gap for the vane foot, so that tension during clamping is distributed evenly
 //# arm_offset - distance between the top of the base and bottom of the arm
 //# vane_length - length of the vane
@@ -72,6 +73,7 @@ module cylinder_holer(height = 1,radius = 1,fn = 30){
 //# helical - if true, HELICAL fletching will be used
 //# helical_adjust - horizontal distance between the bottom and top corner of the HELICAL vane
 //# helical_direction - sign of the value determines left or right spin (+ left; - right)
+//# hulled_base - rounds the corners of the base and lid - makes more of a hexagonal shape not tricorn
 //
 module jig (    part_select = 0,
                 arrow_diameter = 6,
@@ -198,8 +200,7 @@ module jig (    part_select = 0,
 
     //arm
     if (part_select == 2 || part_select == 0)
-        rotate(flag_showAll*[0,90,0]) 
-            translate(-flag_showAll*[base_radius,0,arm_height/2 + base_height + arm_offset])
+    translate([base_radius,0,0])
     union()
     {
         difference()
