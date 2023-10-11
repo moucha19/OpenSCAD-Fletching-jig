@@ -34,9 +34,9 @@ hinge_diameter = 5.1;
 hinge_depth = 10.1;
 
 // Diameter of the sphere that pivots the halves of the hinge. Maximum depends on both the hinge diameter and the space between hinge extensions. Larger values will provide more strength to the pivot. Smaller values will be easier to pop into place when assembling. See hinge holes below.
-hinge_pin = 3.1;
+hinge_pin_diameter = 3.1;
 
-// Makes holes for a pin or bolt rather than a sphere pivot for the hinge. You can use a bit of filament as the pin. If so, recommend hinge_pin 1.9 for 1.75mm filament
+// Makes holes for a pin or bolt rather than a sphere pivot for the hinge. You can use a bit of filament as the pin. If so, recommend hinge_pin_diameter 1.9 for 1.75mm filament
 hinge_holes = false;
 
 // Gap for the vane foot in the arm so that the tension is distributed evenly on the vanes during clamping. This value will depend on your vanes. A value too small will clamp unevenly, a value too large will not clamp the vane.
