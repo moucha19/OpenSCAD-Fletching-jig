@@ -35,3 +35,5 @@ module hinge (hinge_width = 7, hinge_thickness = 1.5, hinge_diameter = 5, hinge_
             }
         }
 }
+
+// hinge (hinge_pin_diameter = 3, holer=true, hinge_holes = true);
