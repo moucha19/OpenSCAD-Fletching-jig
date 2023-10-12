@@ -294,7 +294,7 @@ module jig (    part_select = 0,
             }
         }
         translate([base_radius - hinge_radius, 0, base_height - hinge_depth + hinge_radius]) 
-            hinge(hinge_width - hinge_gap, hinge_thickness, hinge_diameter - hinge_gap, hinge_depth + arm_offset - hinge_radius, hinge_pin_diameter - hinge_gap, false, hinge_holes);
+            hinge(hinge_width - hinge_gap, hinge_thickness, hinge_diameter - hinge_gap, hinge_depth + arm_offset - hinge_radius, hinge_pin_diameter - hinge_gap, holer=false, hinge_holes=hinge_holes);
     }
 
     //lid
