@@ -52,8 +52,8 @@ module nock_insert (nock, nock_width, nock_depth, arrow_diameter, arrow_offset)
     if (nock == true)
     {
         nock_radius = (nock_width >= 2) ? 1 : nock_width / 2;
-        nock_length = (arrow_diameter + (arrow_diameter / 2));
-        translate([0,0,arrow_offset])
+        nock_length = arrow_diameter;
+        translate([0,0,arrow_offset + nock_depth/2])
             difference() 
             {
                 cube([nock_width, nock_length, nock_depth], true);
@@ -172,7 +172,7 @@ module jig (    part_select = 0,
     min_vane_offset = (base_height - arrow_offset) + arm_offset + 4;  
     vane_offset = vane_offset >= min_vane_offset ? vane_offset : min_vane_offset;
     nock_depth = abs(nock_depth) <= base_height - arrow_offset ? abs(nock_depth) : base_height - arrow_offset;
-    nock_width = abs(nock_width) <= arrow_diameter ? abs(nock_depth) : arrow_diameter;
+    nock_width = abs(nock_width) <= arrow_diameter ? abs(nock_width) : arrow_diameter;
 
     //dependent internal variables
     base_diameter = arrow_diameter + 2*hinge_diameter + 2;
