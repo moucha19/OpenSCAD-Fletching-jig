@@ -18,3 +18,18 @@ module bezier (p0, p1, p2, w)
         }
     }
 }
+
+//
+//Creates a fillet shape for difference operator
+//# r - fillet radius
+//# w - width of the filleted edge
+//# center - centers on the circle 
+//
+module fillet(r = 5, w = 5, center=true)
+{
+    difference()
+    {
+        translate([r/2,r/2,0]) cube([r,r,w], center=center);
+        cylinder(r=r, h=2*w+0.1, center=center);
+    }
+}
