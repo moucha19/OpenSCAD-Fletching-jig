@@ -1,5 +1,4 @@
-use <quadratic_bezier.scad>
-use <rounded_cube.scad>
+use <components.scad>
 use <hinge.scad>
 use <MCAD/regular_shapes.scad>
 
@@ -53,8 +52,20 @@ module nock_insert (nock, nock_width, nock_depth, arrow_diameter, arrow_offset)
     if (nock == true)
     {
         nock_radius = (nock_width >= 2) ? 1 : nock_width / 2;
+        nock_length = (arrow_diameter + (arrow_diameter / 2));
         translate([0,0,arrow_offset])
-        roundedcube([nock_width, (arrow_diameter + (arrow_diameter / 2)), nock_depth], true, nock_radius, "zmax");
+            difference() 
+            {
+                cube([nock_width, nock_length, nock_depth], true);
+                translate([0,0,nock_depth/2 - nock_radius]) rotate ([90,0,0])
+                {
+                    translate([nock_width/2 - nock_radius,0,0]) 
+                        fillet(r = nock_radius, w = nock_length, center = true);
+                    translate([-(nock_width/2 - nock_radius),0,0])
+                        mirror([1,0,0])  
+                            fillet(r = nock_radius, w = nock_length, center = true);
+                }
+            }
     }
 }
 
