@@ -42,6 +42,15 @@ arm_gap = 0.5;
 // Distance between the top of the base and bottom of the arm.
 arm_offset = 1.5;//[0.1:0.1:2]
 
+// nock for aligning wooden arrows that have a carved-in nock
+nock = true;
+
+// Width of the nock (measure smallest point)
+nock_width = 3;//[3:1:4]
+
+// Depth of the nock (height of the nock guide)
+nock_depth = 4;//[3:1:6]
+
 /* [Fletching] */
 
 // Length of the vane.
@@ -91,5 +100,8 @@ jig (
         vane_turn,
         helical,
         helical_adjust,
-        helical_direction
+        helical_direction,
+        nock,
+        nock_width,
+        nock_depth
     );

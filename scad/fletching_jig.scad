@@ -1,4 +1,5 @@
 use <quadratic_bezier.scad>
+use <rounded_cube.scad>
 use <hinge.scad>
 use <MCAD/regular_shapes.scad>
 
@@ -44,6 +45,19 @@ module base_mold (a = 8, radius = 15, height = 20)
     }
 }
 
+//
+// Create nock alignment
+//
+module nock_insert (nock, nock_width, nock_depth, arrow_diameter, arrow_offset)
+{
+    if (nock == true)
+    {
+        nock_radius = (nock_width >= 2) ? 1 : nock_width / 2;
+        translate([0,0,arrow_offset])
+        roundedcube([nock_width, (arrow_diameter + (arrow_diameter / 2)), nock_depth], true, nock_radius, "zmax");
+    }
+}
+
 // Polyhole compensated cylinder (that cut's hole for the arrow into the base) for correct fit 
 // https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/undersized_circular_objects
 module cylinder_holer(height = 1,radius = 1,fn = 30){
@@ -70,6 +84,9 @@ module cylinder_holer(height = 1,radius = 1,fn = 30){
 //# helical - if true, HELICAL fletching will be used
 //# helical_adjust - horizontal distance between the bottom and top corner of the HELICAL vane
 //# helical_direction - sign of the value determines left or right spin (+ left; - right)
+//# nock - boolan (true/false) if nock should be added
+//# nock_width - gap size of the nock
+//# nock_depth - the height you want the nock guide to be
 //
 module jig (    part_select = 0,
                 arrow_diameter = 6,
@@ -89,6 +106,9 @@ module jig (    part_select = 0,
                 helical = false,
                 helical_adjust = 3.5,
                 helical_direction = 1,
+                nock = false,
+                nock_width = 3,
+                nock_depth = 3,
                 fn = 30
              ) 
 {
@@ -272,4 +292,6 @@ module jig (    part_select = 0,
         translate([0,0,lid_thickness] )base_mold(a = w, radius = r, height = h);
         base_mold(a = w - lid_lip, radius = r - lid_lip, height = h);
     }
+    // nocking point
+    nock_insert(nock, nock_width, nock_depth, arrow_diameter, arrow_offset);
 }
