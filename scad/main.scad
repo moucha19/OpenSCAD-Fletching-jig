@@ -46,10 +46,10 @@ arm_offset = 1.5;//[0.1:0.1:2]
 nock = true;
 
 // Width of the nock (measure smallest point)
-nock_width = 3;//[3:1:4]
+nock_width = 3;//[1:0.1:5]
 
 // Depth of the nock (height of the nock guide)
-nock_depth = 4;//[3:1:6]
+nock_depth = 4;//[1:0.1:10]
 
 /* [Fletching] */
 

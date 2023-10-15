@@ -171,6 +171,8 @@ module jig (    part_select = 0,
 
     min_vane_offset = (base_height - arrow_offset) + arm_offset + 4;  
     vane_offset = vane_offset >= min_vane_offset ? vane_offset : min_vane_offset;
+    nock_depth = abs(nock_depth) <= base_height - arrow_offset ? abs(nock_depth) : base_height - arrow_offset;
+    nock_width = abs(nock_width) <= arrow_diameter ? abs(nock_depth) : arrow_diameter;
 
     //dependent internal variables
     base_diameter = arrow_diameter + 2*hinge_diameter + 2;
@@ -203,6 +205,8 @@ module jig (    part_select = 0,
     error_treshold ("vane_offset", "min", vane_offset, min_vane_offset);
     error_treshold ("arrow_offset", "max", arrow_offset, base_height);
     error_treshold ("arm_gap", "max", abs(arm_gap), max_arm_gap);
+    error_treshold ("nock_depth", "max", nock_depth, base_height - arrow_offset);
+    error_treshold ("nock_width", "max", nock_width, arrow_diameter);
 
     assert (min_hinge_width <= max_hinge_width && min_hinge_thickness <= max_hinge_thickness,
             "INVALID HINGE PARAMETERS"
