@@ -308,5 +308,6 @@ module jig (    part_select = 0,
         base_mold(a = w - lid_lip, radius = r - lid_lip, height = h);
     }
     // nocking point
+    if (part_select == 1 || part_select == 0)
     nock_insert(nock, nock_width, nock_depth, arrow_diameter, arrow_offset);
 }
