@@ -47,26 +47,23 @@ module base_mold (a = 8, radius = 15, height = 20)
 //
 // Create nock alignment
 //
-module nock_insert (nock, nock_width, nock_depth, arrow_diameter, arrow_offset)
+module nock_insert (nock_width, nock_depth, arrow_diameter, arrow_offset)
 {
-    if (nock == true)
-    {
-        nock_radius = (nock_width >= 2) ? 1 : nock_width / 2;
-        nock_length = arrow_diameter;
-        translate([0,0,arrow_offset + nock_depth/2])
-            difference() 
+    nock_radius = (nock_width >= 2) ? 1 : nock_width / 2;
+    nock_length = arrow_diameter;
+    translate([0,0,arrow_offset + nock_depth/2])
+        difference() 
+        {
+            cube([nock_width, nock_length, nock_depth], true);
+            translate([0,0,nock_depth/2 - nock_radius]) rotate ([90,0,0])
             {
-                cube([nock_width, nock_length, nock_depth], true);
-                translate([0,0,nock_depth/2 - nock_radius]) rotate ([90,0,0])
-                {
-                    translate([nock_width/2 - nock_radius,0,0]) 
+                translate([nock_width/2 - nock_radius,0,0]) 
+                    fillet(r = nock_radius, w = nock_length, center = true);
+                translate([-(nock_width/2 - nock_radius),0,0])
+                    mirror([1,0,0])  
                         fillet(r = nock_radius, w = nock_length, center = true);
-                    translate([-(nock_width/2 - nock_radius),0,0])
-                        mirror([1,0,0])  
-                            fillet(r = nock_radius, w = nock_length, center = true);
-                }
             }
-    }
+        }
 }
 
 // Polyhole compensated cylinder (that cut's hole for the arrow into the base) for correct fit 
@@ -95,7 +92,7 @@ module cylinder_holer(height = 1,radius = 1,fn = 30){
 //# helical - if true, HELICAL fletching will be used
 //# helical_adjust - horizontal distance between the bottom and top corner of the HELICAL vane
 //# helical_direction - sign of the value determines left or right spin (+ left; - right)
-//# nock - boolan (true/false) if nock should be added
+//# nock - boolean (true/false) if nock should be added
 //# nock_width - gap size of the nock
 //# nock_depth - the height you want the nock guide to be
 //
@@ -214,17 +211,22 @@ module jig (    part_select = 0,
 
     //base
     if (part_select == 1 || part_select == 0)
-    difference()
+    union()
     {
-        base_mold(a = arm_width, radius = base_radius, height = base_height);
-        translate([0,0,arrow_offset]) cylinder_holer(height = base_height,radius = arrow_diameter/2,fn = fn);
-        //hinge holer
-        for (i = [0:2]) 
+        difference()
         {
-            rotate(a=[0,0,i*120]) 
-                translate([(base_radius) - hinge_radius, 0, base_height - hinge_depth + hinge_radius]) 
-                        hinge (hinge_width, hinge_thickness, hinge_diameter, hinge_depth + arm_offset - hinge_radius, hinge_pin, true);
+            base_mold(a = arm_width, radius = base_radius, height = base_height);
+            translate([0,0,arrow_offset]) cylinder_holer(height = base_height,radius = arrow_diameter/2,fn = fn);
+            //hinge holer
+            for (i = [0:2]) 
+            {
+                rotate(a=[0,0,i*120]) 
+                    translate([(base_radius) - hinge_radius, 0, base_height - hinge_depth + hinge_radius]) 
+                            hinge (hinge_width, hinge_thickness, hinge_diameter, hinge_depth + arm_offset - hinge_radius, hinge_pin, true);
+            }
         }
+        if (nock == true)
+            nock_insert(nock_width, nock_depth, arrow_diameter, arrow_offset);
     }
 
     //arm
@@ -307,6 +309,4 @@ module jig (    part_select = 0,
         translate([0,0,lid_thickness] )base_mold(a = w, radius = r, height = h);
         base_mold(a = w - lid_lip, radius = r - lid_lip, height = h);
     }
-    // nocking point
-    nock_insert(nock, nock_width, nock_depth, arrow_diameter, arrow_offset);
 }
