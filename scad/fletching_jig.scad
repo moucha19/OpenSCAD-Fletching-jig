@@ -1,6 +1,6 @@
+use <MCAD/regular_shapes.scad>
 use <components.scad>
 use <hinge.scad>
-use <MCAD/regular_shapes.scad>
 
 //Functions that create console messages
 module error_treshold (value_name, treshold_name, value, treshold)

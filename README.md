@@ -1,4 +1,4 @@
-![](./img/icon_80px.png)
+![](./doc/img/icon_80px.png)
 # OpenSCAD Fletching jig
 
 ## Overview
@@ -51,8 +51,8 @@ nock | if true a nock guide will be added |
 nock_width | width of the nock guide, smallest point of the arrow nock | 0 < arrow_diameter
 nock_depth | depth of nock in your arrow, this will be the height of the nock guide | 0 < (base_height - arrow_offset)
 
-![](./img/dimensions_1.png)
-![](./img/dimensions_2.png)
+![](./doc/img/dimensions_1.png)
+![](./doc/img/dimensions_2.png)
 
 ### Tresholds
 
@@ -77,9 +77,9 @@ These settings were tested on Prusa MK2S. You might need to adjust them slightly
 
 Part | Layer height | Infill | Supports | Bed placement
 --- | --- | --- | --- | --- 
-Arm | 0.15mm or better | 15% | none / 3mm brim | ![](./img/bed_arm.png)
-Base | 0.2mm or better  | 15% | none | ![](./img/bed_base.png)
-Lid | 0.35mm | solid | none | ![](./img/bed_lid.png)
+Arm | 0.15mm or better | 15% | none / 3mm brim | ![](./doc/img/bed_arm.png)
+Base | 0.2mm or better  | 15% | none | ![](./doc/img/bed_base.png)
+Lid | 0.35mm | solid | none | ![](./doc/img/bed_lid.png)
 
 ***
 
