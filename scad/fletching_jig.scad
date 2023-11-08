@@ -275,14 +275,15 @@ module jig (    part_select = 0,
             }
 
             //vane foot cutout
-            translate([0,0,arrow_offset + vane_offset])
+            vane_foot_easein = 2*arm_gap;
+            translate([0,0,arrow_offset + vane_offset - vane_foot_easein])
             {
                 difference()
                 {
-                    cylinder(vane_length,r=arrow_radius + arm_gap, true);
-                    cylinder_fillet(rc = arrow_radius, r1 = arm_gap, r2 = 2*arm_gap, bottom = true);
-                    translate(v = [0,0,vane_length - 2*arm_gap]) 
-                        cylinder_fillet(rc = arrow_radius, r1 = arm_gap, r2 = 2*arm_gap, bottom = false);
+                    cylinder(vane_length + 2*vane_foot_easein,r=arrow_radius + arm_gap, true);
+                    cylinder_fillet(rc = arrow_radius, r1 = arm_gap, r2 = vane_foot_easein, bottom = true);
+                    translate(v = [0,0,vane_length + vane_foot_easein]) 
+                        cylinder_fillet(rc = arrow_radius, r1 = arm_gap, r2 = vane_foot_easein, bottom = false);
                 }
             }
         }
