@@ -1,4 +1,3 @@
-use <MCAD/regular_shapes.scad>
 use <components.scad>
 use <hinge.scad>
 
@@ -276,15 +275,14 @@ module jig (    part_select = 0,
             }
 
             //vane foot cutout
-            translate([0,0,arrow_offset + vane_offset]) cylinder(vane_length,r=arrow_radius + arm_gap, true);
-            minkowski()
+            translate([0,0,arrow_offset + vane_offset])
             {
-                translate([0,0,arrow_offset + vane_offset]) cylinder(vane_length,r=arrow_radius, true);
-                rotate_extrude(angle = 360, convexity = 2) 
                 difference()
                 {
-                    rotate([0,0,90]) ellipse(4*arm_gap, 2*arm_gap);
-                    translate([0,-2*arm_gap]) square(4*arm_gap, false);
+                    cylinder(vane_length,r=arrow_radius + arm_gap, true);
+                    cylinder_fillet(rc = arrow_radius, r1 = arm_gap, r2 = 2*arm_gap, bottom = true);
+                    translate(v = [0,0,vane_length - 2*arm_gap]) 
+                        cylinder_fillet(rc = arrow_radius, r1 = arm_gap, r2 = 2*arm_gap, bottom = false);
                 }
             }
         }
