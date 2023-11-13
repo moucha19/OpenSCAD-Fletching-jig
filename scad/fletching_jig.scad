@@ -5,7 +5,7 @@ use <MCAD/regular_shapes.scad>
 //Functions that create console messages
 module error_treshold (value_name, treshold_name, value, treshold)
 {
-    if (value == treshold) 
+    if (value == treshold)
         echo(str("<font color='red'>", value_name," treshold (", treshold_name, " = ", treshold, ") reached!</font>"));
 }
 module info_treshold (value_name, treshold_name, treshold)
@@ -33,10 +33,10 @@ module helical_vane (width = 1, length = 75, height = 10, spread = 4, twist = 15
 //Creates basic shape of the jig's base
 //
 module base_mold (a = 8, radius = 15, height = 20, hulled=false) {
-    module base_triangle(a, radius, height){ 
-        for (i = [0:3]) 
+    module base_triangle(a, radius, height){
+        for (i = [0:3])
         {
-            rotate(a=[0,0,i*120]) translate([0,-a/2,0]) 
+            rotate(a=[0,0,i*120]) translate([0,-a/2,0])
                 cube([radius, a, height], false);
         }
     }
@@ -46,7 +46,7 @@ module base_mold (a = 8, radius = 15, height = 20, hulled=false) {
       base_triangle(a, radius, height);
 }
 
-// Polyhole compensated cylinder (that cut's hole for the arrow into the base) for correct fit 
+// Polyhole compensated cylinder (that cut's hole for the arrow into the base) for correct fit
 // https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/undersized_circular_objects
 module cylinder_holer(height = 1,radius = 1,fn = 30){
    fudge = 1/cos(180/fn);
@@ -62,8 +62,8 @@ module cylinder_holer(height = 1,radius = 1,fn = 30){
 //# hinge_thickness - thickness of the hinge extension attached to the bottom of the arm
 //# hinge_diameter - diameter of the circular part of the hinge that forms a joint
 //# hinge_depth - how deep into the base is the hinge cutout
-//# hinge_pin_diameter - diameter of the sphere that connects two halves of the hinge together 
-//# hinge_holes - make a hole rather than sphere so you can put a pin through to hold the hinge together
+//# hinge_pin - diameter of the sphere that connects two halves of the hinge together
+//# hinge_style - make a hole so you can put a pin through to hold the hinge together, or ball joint that requires no pin
 //# arm_gap - gap for the vane foot, so that tension during clamping is distributed evenly
 //# arm_offset - distance between the top of the base and bottom of the arm
 //# vane_length - length of the vane
@@ -80,27 +80,29 @@ module jig (    part_select = 0,
                 arrow_offset = 3,
                 base_height = 20,
                 hinge_width = 6.5,
-                hinge_thickness = 1.5, 
+                hinge_thickness = 1.5,
                 hinge_diameter = 5,
                 hinge_depth = 10,
-                hinge_pin_diameter = 3,
-                arm_gap = 0.5,         
+                hinge_pin = 3,
+                arm_gap = 0.5,
                 arm_offset = 1.5,
-                vane_length = 75, 
-                vane_width = 1.1, 
+                vane_length = 75,
+                vane_width = 1.1,
                 vane_offset = 25,
                 vane_turn = 0,
                 helical = false,
                 helical_adjust = 3.5,
                 helical_direction = 1,
-                hulled_base = false,
-                hinge_holes = false,
+                base_style = "hexagon",
+                hinge_style = "ball joint",
                 fn = 30
-             ) 
+             )
 {
     //independent internal variables
     hinge_gap = 0.1;
-    flag_showAll = part_select == 0 ? 0 : 1; 
+    flag_showAll = part_select == 0 ? 0 : 1;
+    hulled_base = base_style == "hexagon" ? true : false;
+    hinge_holes = hinge_style == "ball joint" ? false : true;
 
     //input corrections and tresholds
     min_arrow_diameter = 2;
@@ -109,29 +111,29 @@ module jig (    part_select = 0,
     min_base_height = 5;
     base_height = base_height >= min_base_height ? base_height : min_base_height;
 
-    hinge_depth = abs(hinge_depth) <= base_height 
+    hinge_depth = abs(hinge_depth) <= base_height
                     ? (abs(hinge_depth) >= min_base_height ? abs(hinge_depth) : min_base_height)
                     : base_height;
-    
+
     min_hinge_diameter = 2;
-    hinge_diameter = abs(hinge_diameter) <= hinge_depth 
+    hinge_diameter = abs(hinge_diameter) <= hinge_depth
                         ? (abs(hinge_diameter) >= min_hinge_diameter ? abs(hinge_diameter) : min_hinge_diameter)
                         : hinge_depth;
 
     min_hinge_thickness = 1;
     min_hinge_width = 2*min_hinge_thickness + hinge_gap;
     max_hinge_width = (3*arrow_diameter)/sqrt(3); //inscribed circle in equilateral triangle formula
-    hinge_width     = abs(hinge_width) >= min_hinge_width 
-                        ? (abs(hinge_width) <= max_hinge_width ? abs(hinge_width) : max_hinge_width) 
+    hinge_width     = abs(hinge_width) >= min_hinge_width
+                        ? (abs(hinge_width) <= max_hinge_width ? abs(hinge_width) : max_hinge_width)
                         : min_hinge_width;
 
     max_hinge_thickness = (hinge_width-hinge_gap)/2;
     hinge_thickness = abs(hinge_thickness) >= min_hinge_thickness
-                        ? (abs(hinge_thickness) <= max_hinge_thickness ? abs(hinge_thickness) : max_hinge_thickness) 
+                        ? (abs(hinge_thickness) <= max_hinge_thickness ? abs(hinge_thickness) : max_hinge_thickness)
                         : min_hinge_thickness;
 
     max_hinge_pin_diameter = min(hinge_diameter, hinge_width - hinge_gap - 2*hinge_thickness);
-    hinge_pin_diameter = abs(hinge_pin_diameter) <= max_hinge_pin_diameter ? abs(hinge_pin_diameter) : max_hinge_pin_diameter;
+    hinge_pin = abs(hinge_pin) <= max_hinge_pin_diameter ? abs(hinge_pin) : max_hinge_pin_diameter;
 
     arrow_offset = abs(arrow_offset) <= base_height ? abs(arrow_offset) : base_height;
 
@@ -144,7 +146,7 @@ module jig (    part_select = 0,
 
     arm_offset = abs(arm_offset);
 
-    min_vane_offset = (base_height - arrow_offset) + arm_offset + 4;  
+    min_vane_offset = (base_height - arrow_offset) + arm_offset + 4;
     vane_offset = vane_offset >= min_vane_offset ? vane_offset : min_vane_offset;
 
     //dependent internal variables
@@ -153,7 +155,7 @@ module jig (    part_select = 0,
     arrow_radius = arrow_diameter/2;
     hinge_radius = hinge_diameter/2;
     arm_height = vane_length + 2*(vane_offset-arm_offset-(base_height - arrow_offset));
-    arm_width = hinge_width + hinge_pin_diameter + 3;
+    arm_width = hinge_width + hinge_pin + 3;
 
     //max vane turn limit calculation
     max_vane_turn = atan((((arrow_radius+arm_gap)*sqrt(3))/2 - vane_width/2)/(vane_length/2));
@@ -174,7 +176,7 @@ module jig (    part_select = 0,
     error_treshold ("hinge_width", "max", hinge_width, max_hinge_width);
     error_treshold ("hinge_thickness", "min", hinge_thickness, min_hinge_thickness);
     error_treshold ("hinge_thickness", "max", hinge_thickness, max_hinge_thickness);
-    error_treshold ("hinge_pin_diameter", "max", hinge_pin_diameter, max_hinge_pin_diameter);
+    error_treshold ("hinge_pin", "max", hinge_pin, max_hinge_pin_diameter);
     error_treshold ("vane_offset", "min", vane_offset, min_vane_offset);
     error_treshold ("arrow_offset", "max", arrow_offset, base_height);
     error_treshold ("arm_gap", "max", abs(arm_gap), max_arm_gap);
@@ -190,11 +192,11 @@ module jig (    part_select = 0,
         base_mold(a = arm_width, radius = base_radius, height = base_height, hulled=hulled_base);
         translate([0,0,arrow_offset]) cylinder_holer(height = base_height,radius = arrow_diameter/2,fn = fn);
         //hinge holer
-        for (i = [0:2]) 
+        for (i = [0:2])
         {
-            rotate(a=[0,0,i*120]) 
-                translate([(base_radius) - hinge_radius, 0, base_height - hinge_depth + hinge_radius]) 
-                        hinge (hinge_width, hinge_thickness, hinge_diameter, hinge_depth + arm_offset - hinge_radius, hinge_pin_diameter, true, hinge_holes);
+            rotate(a=[0,0,i*120])
+                translate([(base_radius) - hinge_radius, 0, base_height - hinge_depth + hinge_radius])
+                        hinge (hinge_width, hinge_thickness, hinge_diameter, hinge_depth + arm_offset - hinge_radius, hinge_pin, true, hinge_holes);
         }
     }
 
@@ -205,15 +207,15 @@ module jig (    part_select = 0,
     {
         difference()
         {
-            translate([0,-arm_width/2,base_height + arm_offset])  
+            translate([0,-arm_width/2,base_height + arm_offset])
                 cube([base_radius, arm_width, arm_height], false);
             //intersections with two remaining arms
-            rotate(a = 120) translate([ -arm_width,0,base_height + arm_offset]) 
+            rotate(a = 120) translate([ -arm_width,0,base_height + arm_offset])
                 cube([arm_width*2, arrow_diameter, arm_height], false);
-            rotate(a = -120) mirror([0,1,0]) translate([ -arm_width,0,base_height + arm_offset]) 
+            rotate(a = -120) mirror([0,1,0]) translate([ -arm_width,0,base_height + arm_offset])
                 cube([arm_width*2, arrow_diameter, arm_height], false);
             //shaft hole
-            translate([0,0,base_height]) 
+            translate([0,0,base_height])
                 cylinder(arm_height + base_height,d=arrow_diameter, true);
             //vane
             if (helical == 0)
@@ -248,7 +250,7 @@ module jig (    part_select = 0,
             minkowski()
             {
                 translate([0,0,arrow_offset + vane_offset]) cylinder(vane_length,r=arrow_radius, true);
-                rotate_extrude(angle = 360, convexity = 2) 
+                rotate_extrude(angle = 360, convexity = 2)
                 difference()
                 {
                     rotate([0,0,90]) ellipse(4*arm_gap, 2*arm_gap);
@@ -256,8 +258,8 @@ module jig (    part_select = 0,
                 }
             }
         }
-        translate([base_radius - hinge_radius, 0, base_height - hinge_depth + hinge_radius]) 
-            hinge(hinge_width - hinge_gap, hinge_thickness, hinge_diameter - hinge_gap, hinge_depth + arm_offset - hinge_radius, hinge_pin_diameter - hinge_gap, holer=false, hinge_holes=hinge_holes);
+        translate([base_radius - hinge_radius, 0, base_height - hinge_depth + hinge_radius])
+            hinge(hinge_width - hinge_gap, hinge_thickness, hinge_diameter - hinge_gap, hinge_depth + arm_offset - hinge_radius, hinge_pin - hinge_gap, holer=false, hinge_holes=hinge_holes);
     }
 
     //lid
@@ -267,7 +269,7 @@ module jig (    part_select = 0,
     lid_gap = 0.25;
 
     if (part_select == 3 || part_select == 0 || part_select == 4)
-        translate([-3*base_radius,0,0]) 
+        translate([-3*base_radius,0,0])
     difference()
     {
         h = vane_offset-arm_offset-(base_height - arrow_offset) + lid_thickness;

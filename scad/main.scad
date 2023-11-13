@@ -34,10 +34,10 @@ hinge_diameter = 5.1;
 hinge_depth = 10.1;
 
 // Diameter of the sphere that pivots the halves of the hinge. Maximum depends on both the hinge diameter and the space between hinge extensions. Larger values will provide more strength to the pivot. Smaller values will be easier to pop into place when assembling. See hinge holes below.
-hinge_pin_diameter = 3.1;
+hinge_pin = 3.1;
 
-// Makes holes for a pin or bolt rather than a sphere pivot for the hinge. You can use a bit of filament as the pin. If so, recommend hinge_pin_diameter 2.0 for 1.75mm filament
-hinge_holes = false;
+// Makes holes for a pin or bolt rather than a sphere pivot for the hinge. You can use a bit of filament as the pin. If so, recommend hinge_pin 2.0 for 1.75mm filament
+hinge_style = "ball joint"; // ["ball joint", "pin hole"] 
 
 // Gap for the vane foot in the arm so that the tension is distributed evenly on the vanes during clamping. This value will depend on your vanes. A value too small will clamp unevenly, a value too large will not clamp the vane.
 arm_gap = 0.5;
@@ -68,8 +68,8 @@ helical_adjust = 3.5; //[0:0.1:30]
 // Direction of the helical fletching and thus the arrow spin direction.
 helical_direction = 1;//[1:left, -1:right]
 
-// Whether the base (and lid) have joined up edges making hexagon like shape not tricorn. Tricorn shape is better for using hinge pins or screws. 
-hulled_base = false;
+// Whether the base (and lid) have joined up edges making hexagon like shape or not joined like a forked cross. Cross shape is better for using hinge pins or screws. 
+base_style = "hexagon"; // [ "hexagon", "cross" ]
 
 
 
@@ -90,7 +90,7 @@ jig (
         hinge_thickness,
         hinge_diameter,
         hinge_depth,
-        hinge_pin_diameter,
+        hinge_pin,
         arm_gap,
         arm_offset,
         vane_length,
@@ -100,6 +100,6 @@ jig (
         helical,
         helical_adjust,
         helical_direction,
-        hulled_base,
-        hinge_holes
+        base_style,
+        hinge_style
     );
