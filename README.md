@@ -37,7 +37,7 @@ hinge_width | width of the hinge cutout on the base | 2.1 < ■ < *depends on ar
 hinge_thickness | thickness of the hinge extension attached to the bottom of the arm | 1 < ■ < *depends on hinge_width*
 hinge_diameter | diameter of the circular part of the hinge that forms a joint | 2 < ■ < hinge_depth
 hinge_depth | how deep into the base is the hinge cutout | 5 < ■ < base_height
-hinge_pin | diameter of the sphere that connects two halves of the hinge together | 0 < ■ < min(hinge_diameter, space between hinge extensions)
+hinge_pin | diameter of the pin or ball that connects two halves of the hinge together | 0 < ■ < min(hinge_diameter, space between hinge extensions)
 arm_gap | gap for the vane foot, so that tension during clamping is distributed evenly | 0 < ■ < 1.5
 arm_offset | distance between the top of the base and bottom of the arm | 0 < ■ < 1.5 
 vane_length | length of the vane | 0 < ■
