@@ -112,9 +112,6 @@ jig (
         nock,
         nock_width,
         nock_depth,
-        helical_direction,
-        hulled_base,
-        hinge_holes
         base_style,
         hinge_style
     );
