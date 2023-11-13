@@ -84,8 +84,8 @@ module cylinder_holer(height = 1,radius = 1,fn = 30){
 //# hinge_thickness - thickness of the hinge extension attached to the bottom of the arm
 //# hinge_diameter - diameter of the circular part of the hinge that forms a joint
 //# hinge_depth - how deep into the base is the hinge cutout
-//# hinge_pin_diameter - diameter of the sphere that connects two halves of the hinge together 
-//# hinge_holes - make a hole rather than sphere so you can put a pin through to hold the hinge together
+//# hinge_pin - diameter of the sphere that connects two halves of the hinge together
+//# hinge_style - make a hole so you can put a pin through to hold the hinge together, or ball joint that requires no pin
 //# arm_gap - gap for the vane foot, so that tension during clamping is distributed evenly
 //# arm_offset - distance between the top of the base and bottom of the arm
 //# vane_length - length of the vane
@@ -108,7 +108,7 @@ module jig (    part_select = 0,
                 hinge_thickness = 1.5, 
                 hinge_diameter = 5,
                 hinge_depth = 10,
-                hinge_pin_diameter = 3,
+                hinge_pin = 3,
                 arm_gap = 0.5,         
                 arm_offset = 1.5,
                 vane_length = 75, 
@@ -121,14 +121,16 @@ module jig (    part_select = 0,
                 nock = false,
                 nock_width = 3,
                 nock_depth = 3,
-                hulled_base = false,
-                hinge_holes = false,
+                base_style = "hexagon",
+                hinge_style = "ball joint",
                 fn = 30
              ) 
 {
     //independent internal variables
     hinge_gap = 0.1;
     flag_showAll = part_select == 0 ? 0 : 1; 
+    hulled_base = base_style == "hexagon" ? true : false;
+    hinge_holes = hinge_style == "ball joint" ? false : true;
 
     //input corrections and tresholds
     min_arrow_diameter = 2;
@@ -159,7 +161,7 @@ module jig (    part_select = 0,
                         : min_hinge_thickness;
 
     max_hinge_pin_diameter = min(hinge_diameter, hinge_width - hinge_gap - 2*hinge_thickness);
-    hinge_pin_diameter = abs(hinge_pin_diameter) <= max_hinge_pin_diameter ? abs(hinge_pin_diameter) : max_hinge_pin_diameter;
+    hinge_pin = abs(hinge_pin) <= max_hinge_pin_diameter ? abs(hinge_pin) : max_hinge_pin_diameter;
 
     arrow_offset = abs(arrow_offset) <= base_height ? abs(arrow_offset) : base_height;
 
@@ -183,7 +185,7 @@ module jig (    part_select = 0,
     arrow_radius = arrow_diameter/2;
     hinge_radius = hinge_diameter/2;
     arm_height = vane_length + 2*(vane_offset-arm_offset-(base_height - arrow_offset));
-    arm_width = hinge_width + hinge_pin_diameter + 3;
+    arm_width = hinge_width + hinge_pin + 3;
 
     //max vane turn limit calculation
     max_vane_turn = atan((((arrow_radius+arm_gap)*sqrt(3))/2 - vane_width/2)/(vane_length/2));
@@ -204,7 +206,7 @@ module jig (    part_select = 0,
     error_treshold ("hinge_width", "max", hinge_width, max_hinge_width);
     error_treshold ("hinge_thickness", "min", hinge_thickness, min_hinge_thickness);
     error_treshold ("hinge_thickness", "max", hinge_thickness, max_hinge_thickness);
-    error_treshold ("hinge_pin_diameter", "max", hinge_pin_diameter, max_hinge_pin_diameter);
+    error_treshold ("hinge_pin", "max", hinge_pin, max_hinge_pin_diameter);
     error_treshold ("vane_offset", "min", vane_offset, min_vane_offset);
     error_treshold ("arrow_offset", "max", arrow_offset, base_height);
     error_treshold ("arm_gap", "max", abs(arm_gap), max_arm_gap);
@@ -228,7 +230,7 @@ module jig (    part_select = 0,
             {
                 rotate(a=[0,0,i*120]) 
                     translate([(base_radius) - hinge_radius, 0, base_height - hinge_depth + hinge_radius]) 
-                        hinge (hinge_width, hinge_thickness, hinge_diameter, hinge_depth + arm_offset - hinge_radius, hinge_pin_diameter, true, hinge_holes);
+                        hinge (hinge_width, hinge_thickness, hinge_diameter, hinge_depth + arm_offset - hinge_radius, hinge_pin, true, hinge_holes);
             }
         }
         if (nock == true)
@@ -294,7 +296,7 @@ module jig (    part_select = 0,
             }
         }
         translate([base_radius - hinge_radius, 0, base_height - hinge_depth + hinge_radius]) 
-            hinge(hinge_width - hinge_gap, hinge_thickness, hinge_diameter - hinge_gap, hinge_depth + arm_offset - hinge_radius, hinge_pin_diameter - hinge_gap, holer=false, hinge_holes=hinge_holes);
+            hinge(hinge_width - hinge_gap, hinge_thickness, hinge_diameter - hinge_gap, hinge_depth + arm_offset - hinge_radius, hinge_pin - hinge_gap, holer=false, hinge_holes=hinge_holes);
     }
 
     //lid
