@@ -160,8 +160,8 @@ module jig (    part_select = 0,
                         ? (abs(hinge_thickness) <= max_hinge_thickness ? abs(hinge_thickness) : max_hinge_thickness) 
                         : min_hinge_thickness;
 
-    max_hinge_pin_diameter = min(hinge_diameter, hinge_width - hinge_gap - 2*hinge_thickness);
-    hinge_pin = abs(hinge_pin) <= max_hinge_pin_diameter ? abs(hinge_pin) : max_hinge_pin_diameter;
+    max_hinge_pin = min(hinge_diameter, hinge_width - hinge_gap - 2*hinge_thickness);
+    hinge_pin = abs(hinge_pin) <= max_hinge_pin ? abs(hinge_pin) : max_hinge_pin;
 
     arrow_offset = abs(arrow_offset) <= base_height ? abs(arrow_offset) : base_height;
 
@@ -218,7 +218,7 @@ module jig (    part_select = 0,
     );
 
     //base
-    if (part_select == 1 || part_select == 0 || part_select == 4)
+    if (part_select == 1 || part_select == 0)
     union()
     {
         difference()
@@ -239,7 +239,8 @@ module jig (    part_select = 0,
 
     //arm
     if (part_select == 2 || part_select == 0)
-    translate([base_radius,0,0])
+        rotate(flag_showAll*[0,90,0]) 
+            translate(-flag_showAll*[base_radius,0,arm_height/2 + base_height + arm_offset])
     union()
     {
         difference()
@@ -305,8 +306,8 @@ module jig (    part_select = 0,
     lid_lip = 2;
     lid_gap = 0.25;
 
-    if (part_select == 3 || part_select == 0 || part_select == 4)
-        translate([-3*base_radius,0,0]) 
+    if (part_select == 3 || part_select == 0)
+        translate((flag_showAll-1)*[3*base_radius,0,0])
     difference()
     {
         h = vane_offset-arm_offset-(base_height - arrow_offset) + lid_thickness;
