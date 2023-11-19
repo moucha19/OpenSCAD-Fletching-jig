@@ -206,7 +206,7 @@ module jig (    part_select = 0,
     error_treshold ("hinge_width", "max", hinge_width, max_hinge_width);
     error_treshold ("hinge_thickness", "min", hinge_thickness, min_hinge_thickness);
     error_treshold ("hinge_thickness", "max", hinge_thickness, max_hinge_thickness);
-    error_treshold ("hinge_pin", "max", hinge_pin, max_hinge_pin_diameter);
+    error_treshold ("hinge_pin", "max", hinge_pin, max_hinge_pin);
     error_treshold ("vane_offset", "min", vane_offset, min_vane_offset);
     error_treshold ("arrow_offset", "max", arrow_offset, base_height);
     error_treshold ("arm_gap", "max", abs(arm_gap), max_arm_gap);
