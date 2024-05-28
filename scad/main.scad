@@ -54,6 +54,9 @@ nock_width = 3;//[1:0.1:5]
 // Depth of the nock (height of the nock guide)
 nock_depth = 4;//[1:0.1:10]
 
+// Outer width of the nock
+nock_diameter = 6;//[2:0.1:30]
+
 /* [Fletching] */
 
 // Length of the vane.
@@ -112,6 +115,7 @@ jig (
         nock,
         nock_width,
         nock_depth,
+        nock_diameter,
         base_style,
         hinge_style
     );

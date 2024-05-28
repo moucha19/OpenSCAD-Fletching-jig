@@ -121,6 +121,7 @@ module jig (    part_select = 0,
                 nock = false,
                 nock_width = 3,
                 nock_depth = 3,
+                nock_diameter = 6,
                 base_style = "hexagon",
                 hinge_style = "ball joint",
                 fn = 30
@@ -212,6 +213,7 @@ module jig (    part_select = 0,
     error_treshold ("arm_gap", "max", abs(arm_gap), max_arm_gap);
     error_treshold ("nock_depth", "max", nock_depth, base_height - arrow_offset);
     error_treshold ("nock_width", "max", nock_width, arrow_diameter);
+    error_treshold ("nock_diameter", "min", nock_diameter, arrow_diameter);
 
     assert (min_hinge_width <= max_hinge_width && min_hinge_thickness <= max_hinge_thickness,
             "INVALID HINGE PARAMETERS"
@@ -223,8 +225,11 @@ module jig (    part_select = 0,
     {
         difference()
         {
-        base_mold(a = arm_width, radius = base_radius, height = base_height, hulled=hulled_base);
-            translate([0,0,arrow_offset]) cylinder_holer(height = base_height,radius = arrow_diameter/2,fn = fn);
+            base_mold(a = arm_width, radius = base_radius, height = base_height, hulled=hulled_base);
+            if (nock)
+                translate([0,0,arrow_offset]) cylinder_holer(height = base_height,radius = nock_diameter/2,fn = fn);
+            else
+                translate([0,0,arrow_offset]) cylinder_holer(height = base_height,radius = arrow_diameter/2,fn = fn);
             //hinge holer
             for (i = [0:2]) 
             {
@@ -234,7 +239,7 @@ module jig (    part_select = 0,
             }
         }
         if (nock == true)
-            nock_insert(nock_width, nock_depth, arrow_diameter, arrow_offset);
+            nock_insert(nock_width, nock_depth, nock_diameter, arrow_offset);
     }
 
     //arm
