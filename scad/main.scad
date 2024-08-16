@@ -53,6 +53,9 @@ nock_depth = 4;//[1:0.1:10]
 
 /* [Fletching] */
 
+// Number of vanes.
+vane_count = 4;//[2:1:5]
+
 // Length of the vane.
 vane_length = 72.1;//[0:0.1:200]
 
@@ -94,6 +97,7 @@ jig (
         hinge_pin,
         arm_gap,
         arm_offset,
+        vane_count,
         vane_length,
         vane_width,
         vane_offset,

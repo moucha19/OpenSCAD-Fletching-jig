@@ -31,10 +31,9 @@ module helical_vane (width = 1, length = 75, height = 10, spread = 4, twist = 15
 //
 //Creates basic shape of the jig's base
 //
-module base_outline (a = 8, radius = 15)
+module base_outline (a = 8, radius = 15, vane_count = 3)
 {
-    sides = 3;
-    rotation_by = 360/sides;
+    rotation_by = 360/vane_count;
     or = sqrt(pow(a/2, 2) + pow(radius, 2)); //? outside radius
     alpha = atan((a/2)/radius); //? half angle of the hinge side
     beta = (rotation_by - 2*alpha)/2; //? half angle of the secondary side
@@ -116,6 +115,7 @@ module jig (    part_select = 0,
                 hinge_pin = 3,
                 arm_gap = 0.5,         
                 arm_offset = 1.5,
+                vane_count = 3,
                 vane_length = 75, 
                 vane_width = 1.1, 
                 vane_offset = 25,
@@ -131,6 +131,8 @@ module jig (    part_select = 0,
 {
     //independent internal variables
     hinge_gap = 0.1;
+    hinge_to_arrow_gap = 2;
+    min_wall = 0.6;
     flag_showAll = part_select == 0 ? 0 : 1; 
 
     //input corrections and tresholds
@@ -151,7 +153,7 @@ module jig (    part_select = 0,
 
     min_hinge_thickness = 1;
     min_hinge_width = 2*min_hinge_thickness + hinge_gap;
-    max_hinge_width = (3*arrow_diameter)/sqrt(3); //inscribed circle in equilateral triangle formula
+    max_hinge_width = (arrow_diameter + hinge_to_arrow_gap)*tan(180/vane_count) - 2*min_wall; //length of the side of polygon aroung arrow hole, minus min_wall
     hinge_width     = abs(hinge_width) >= min_hinge_width 
                         ? (abs(hinge_width) <= max_hinge_width ? abs(hinge_width) : max_hinge_width) 
                         : min_hinge_width;
@@ -181,12 +183,13 @@ module jig (    part_select = 0,
     nock_width = abs(nock_width) <= arrow_diameter ? abs(nock_width) : arrow_diameter;
 
     //dependent internal variables
-    base_diameter = arrow_diameter + 2*hinge_diameter + 2;
+    base_diameter = arrow_diameter + 2*hinge_diameter + hinge_to_arrow_gap;
     base_radius = base_diameter/2;
     arrow_radius = arrow_diameter/2;
     hinge_radius = hinge_diameter/2;
     arm_height = vane_length + 2*(vane_offset-arm_offset-(base_height - arrow_offset));
     arm_width = hinge_width + hinge_pin + 3;
+    rotation_by = 360/vane_count;
 
     //max vane turn limit calculation
     max_vane_turn = atan((((arrow_radius+arm_gap)*sqrt(3))/2 - vane_width/2)/(vane_length/2));
@@ -224,12 +227,12 @@ module jig (    part_select = 0,
     {
         difference()
         {
-            linear_extrude(base_height) base_outline(a = arm_width, radius = base_radius);
+            linear_extrude(base_height) base_outline(arm_width, base_radius, vane_count);
             translate([0,0,arrow_offset]) cylinder_holer(height = base_height,radius = arrow_diameter/2,fn = fn);
             //hinge holer
-            for (i = [0:2]) 
+            for (i = [0:vane_count-1]) 
             {
-                rotate(a=[0,0,i*120]) 
+                rotate(a=[0,0,i*rotation_by]) 
                     translate([(base_radius) - hinge_radius, 0, base_height - hinge_depth + hinge_radius]) 
                             hinge (hinge_width, hinge_thickness, hinge_diameter, hinge_depth + arm_offset - hinge_radius, hinge_pin, true);
             }
@@ -249,9 +252,9 @@ module jig (    part_select = 0,
             translate([0,-arm_width/2,base_height + arm_offset])  
                 cube([base_radius, arm_width, arm_height], false);
             //intersections with two remaining arms
-            rotate(a = 120) translate([ -arm_width,0,base_height + arm_offset]) 
+            rotate(a = rotation_by/2) translate([ -arm_width,0,base_height + arm_offset]) 
                 cube([arm_width*2, arrow_diameter, arm_height], false);
-            rotate(a = -120) mirror([0,1,0]) translate([ -arm_width,0,base_height + arm_offset]) 
+            rotate(a = -rotation_by/2) mirror([0,1,0]) translate([ -arm_width,0,base_height + arm_offset]) 
                 cube([arm_width*2, arrow_diameter, arm_height], false);
             //shaft hole
             translate([0,0,base_height]) 
@@ -317,14 +320,14 @@ module jig (    part_select = 0,
         linear_extrude(h) 
             difference()
             {
-                offset(delta=lid_thickness) base_outline(a = w, radius = r);
-                base_outline(a = w, radius = r);
+                offset(delta=lid_thickness) base_outline(w, r, vane_count);
+                base_outline(w, r, vane_count);
             }
         linear_extrude(lid_thickness) 
             difference()
             {
-                base_outline(a = w, radius = r);
-                offset(delta=-lid_lip) base_outline(a = w, radius = r);
+                base_outline(w, r, vane_count);
+                offset(delta=-lid_lip) base_outline(w, r, vane_count);
             }
     }
 }
