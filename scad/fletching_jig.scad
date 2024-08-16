@@ -118,7 +118,7 @@ module jig (    part_select = 0,
                 helical = false,
                 helical_adjust = 3.5,
                 helical_direction = 1,
-                nock = false,
+                nock = "none",
                 nock_width = 3,
                 nock_depth = 4,
                 nock_diameter = 0,
@@ -286,9 +286,10 @@ module jig (    part_select = 0,
                             hinge(true);
             }
         }
-        if (nock == true)
+        if (nock != "none")
             translate([0,0,arrow_offset + nock_depth/2])
-                cube([nock_width, base_hole_diameter, nock_depth], true);
+                rotate([0,0,nock == "optimal" && vane_count%2 == 0 && vane_count > 2 ? rotation_by/2 : 0])
+                    cube([nock_width, base_hole_diameter, nock_depth], true);
     }
 
     //arm

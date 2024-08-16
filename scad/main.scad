@@ -12,11 +12,11 @@ part_select = part_select_cmd < 0 ? part_select_gui : part_select_cmd;
 
 /* [Style] */
 // You can either have a snap-in ball joints a hole for external axle (like bolt or piece of filament).
-hinge_style = "ball"; // [ "ball", "axle" ]
+hinge_style = "ball"; // [ "ball":Ball joint, "axle":Axle ]
 // Style of the base.
-base_style = "polygon"; // [ "polygon", "star" ]
+base_style = "polygon"; // [ "polygon":Polygon, "star":Star ]
 // Style of the lid.
-lid_style = "polygon"; // [ "polygon", "star" ]
+lid_style = "polygon"; // [ "polygon":Polygon, "star":Star ]
 
 /* [Jig settings] */
 
@@ -50,8 +50,8 @@ arm_gap = 0.5;
 // Distance between the top of the base and bottom of the arm.
 arm_offset = 1.5;//[0.1:0.1:2]
 
-// nock for aligning wooden arrows that have a carved-in nock
-nock = true;
+// Alignment guide for nocked arrows. For even vane count, you can select if you want to align nock with index vane, or if you prefer to align it between vanes for optimal clearance. 
+nock = "none"; // [ "none":Disabled, "static" : Index vane, "optimal":Optimal clearance]
 
 // Width of the nock (measure smallest point)
 nock_width = 3;//[1:0.1:5]
@@ -86,7 +86,7 @@ vane_turn = 0;// [-30:0.1:30]
 helical_adjust = 3.5; //[0:0.1:30]
 
 // Direction of the helical fletching and thus the arrow spin direction.
-helical_direction = 1;//[1:left, -1:right]
+helical_direction = 1;//[1:Left, -1:Right]
 
 // Verbose info for command line rendering
 if (part_select_cmd != -1)
