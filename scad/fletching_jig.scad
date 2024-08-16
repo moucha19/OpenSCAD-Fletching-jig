@@ -31,7 +31,7 @@ module helical_vane (width = 1, length = 75, height = 10, spread = 4, twist = 15
 //
 //Creates basic shape of the jig's base
 //
-module base_mold (a = 8, radius = 15, height = 20)
+module base_outline (a = 8, radius = 15)
 {
     sides = 3;
     rotation_by = 360/sides;
@@ -50,8 +50,7 @@ module base_mold (a = 8, radius = 15, height = 20)
             //TODO Make adjustable
         ]
     ];
-    linear_extrude (height)
-        polygon(points);
+    polygon(points);
 }
 
 //
@@ -225,7 +224,7 @@ module jig (    part_select = 0,
     {
         difference()
         {
-            base_mold(a = arm_width, radius = base_radius, height = base_height);
+            linear_extrude(base_height) base_outline(a = arm_width, radius = base_radius);
             translate([0,0,arrow_offset]) cylinder_holer(height = base_height,radius = arrow_diameter/2,fn = fn);
             //hinge holer
             for (i = [0:2]) 
@@ -310,13 +309,22 @@ module jig (    part_select = 0,
 
     if (part_select == 3 || part_select == 0)
         translate((flag_showAll-1)*[3*base_radius,0,0]) 
-    difference()
+    union()
     {
         h = vane_offset-arm_offset-(base_height - arrow_offset) + lid_thickness;
         w = arm_width + 2*lid_gap;
         r = base_radius + lid_gap;
-        base_mold(a = w + lid_thickness, radius = r + lid_thickness, height = h);
-        translate([0,0,lid_thickness] )base_mold(a = w, radius = r, height = h);
-        base_mold(a = w - lid_lip, radius = r - lid_lip, height = h);
+        linear_extrude(h) 
+            difference()
+            {
+                offset(delta=lid_thickness) base_outline(a = w, radius = r);
+                base_outline(a = w, radius = r);
+            }
+        linear_extrude(lid_thickness) 
+            difference()
+            {
+                base_outline(a = w, radius = r);
+                offset(delta=-lid_lip) base_outline(a = w, radius = r);
+            }
     }
 }
