@@ -120,7 +120,8 @@ module jig (    part_select = 0,
                 helical_direction = 1,
                 nock = false,
                 nock_width = 3,
-                nock_depth = 3,
+                nock_depth = 4,
+                nock_diameter = 0,
                 hinge_style = "ball",
                 base_style = "polygon",
                 lid_style = "polygon",
@@ -181,7 +182,8 @@ module jig (    part_select = 0,
     nock_width = abs(nock_width) <= arrow_diameter ? abs(nock_width) : arrow_diameter;
 
     //dependent internal variables
-    base_diameter = arrow_diameter + 2*hinge_diameter + hinge_to_arrow_gap;
+    base_hole_diameter = max(arrow_diameter, nock_diameter);
+    base_diameter = base_hole_diameter + 2*hinge_diameter + hinge_to_arrow_gap;
     base_radius = base_diameter/2;
     arrow_radius = arrow_diameter/2;
     hinge_radius = hinge_diameter/2;
@@ -192,7 +194,7 @@ module jig (    part_select = 0,
     hinge_secondary_angle = base_outline_angles(hinge_width, base_radius - hinge_diameter, vane_count)[1];
     arm_fill = (2 * sin(hinge_secondary_angle/2) * hinge_corner_radius) * cos(180-interior_angle) * 2;
 
-    arm_width = hinge_width + (hinge_style == "axel" ? max(arm_fill, hinge_to_arrow_gap) : hinge_pin + 2*min_wall);
+    arm_width = hinge_width + (hinge_style == "axle" ? max(arm_fill, hinge_to_arrow_gap) : max(arm_fill, hinge_pin + 2*min_wall));
     rotation_by = 360/vane_count;
 
     //max vane turn limit calculation
@@ -254,7 +256,7 @@ module jig (    part_select = 0,
                     {
                         translate([-d/2,0,-w/2]) 
                             cube([h + d/2, d/2 + hole_lip, w]);
-                        if (hinge_style == "axel") 
+                        if (hinge_style == "axle") 
                             cylinder( base_diameter, d=pin,  center = true);
                     }
                 }
@@ -262,7 +264,7 @@ module jig (    part_select = 0,
                 {
                     translate([h/2 - hole_lip,0, 0]) 
                         cube([h + d, d + hole_lip, w - 2*hinge_thickness], true);
-                    if (hinge_style == "axel")
+                    if (hinge_style == "axle")
                         cylinder( w*2, d=pin, center=true);
                 }
             }
@@ -275,7 +277,7 @@ module jig (    part_select = 0,
         difference()
         {
             linear_extrude(base_height) base_outline(base_style, arm_width, base_radius, vane_count);
-            translate([0,0,arrow_offset]) cylinder_holer(height = base_height,radius = arrow_diameter/2,fn = fn);
+            translate([0,0,arrow_offset]) cylinder_holer(height = base_height,radius = base_hole_diameter/2,fn = fn);
             //hinge holer
             for (i = [0:vane_count-1]) 
             {
@@ -286,7 +288,7 @@ module jig (    part_select = 0,
         }
         if (nock == true)
             translate([0,0,arrow_offset + nock_depth/2])
-                cube([nock_width, arrow_diameter, nock_depth], true);
+                cube([nock_width, base_hole_diameter, nock_depth], true);
     }
 
     //arm

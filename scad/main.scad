@@ -11,8 +11,8 @@ part_select_cmd = -1;
 part_select = part_select_cmd < 0 ? part_select_gui : part_select_cmd;
 
 /* [Style] */
-// You can either have a snap-in ball joints a hole for external axel (like bolt or piece of filament).
-hinge_style = "ball"; // [ "ball", "axel" ]
+// You can either have a snap-in ball joints a hole for external axle (like bolt or piece of filament).
+hinge_style = "ball"; // [ "ball", "axle" ]
 // Style of the base.
 base_style = "polygon"; // [ "polygon", "star" ]
 // Style of the lid.
@@ -59,10 +59,13 @@ nock_width = 3;//[1:0.1:5]
 // Depth of the nock (height of the nock guide)
 nock_depth = 4;//[1:0.1:10]
 
+// Nock diameter. If it is larger than the arrow diameter, it will be used for the hole in the base, otherwise it has no effect.
+nock_diameter = 0;//[2:0.1:30]
+
 /* [Fletching] */
 
 // Number of vanes.
-vane_count = 4;//[2:1:5]
+vane_count = 3;//[2:1:5]
 
 // Length of the vane.
 vane_length = 72.1;//[0:0.1:200]
@@ -116,6 +119,7 @@ jig (
         nock,
         nock_width,
         nock_depth,
+        nock_diameter,
         hinge_style,
         base_style,
         lid_style
