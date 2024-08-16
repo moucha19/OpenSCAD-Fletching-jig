@@ -69,28 +69,6 @@ function base_outline_angles(a, radius, vane_count) = [
     (360 - vane_count*(2*atan((a/2)/(radius))))/vane_count
 ];
 
-//
-// Create nock alignment
-//
-module nock_insert (nock_width, nock_depth, arrow_diameter, arrow_offset)
-{
-    nock_radius = (nock_width >= 2) ? 1 : nock_width / 2;
-    nock_length = arrow_diameter;
-    translate([0,0,arrow_offset + nock_depth/2])
-        difference() 
-        {
-            cube([nock_width, nock_length, nock_depth], true);
-            translate([0,0,nock_depth/2 - nock_radius]) rotate ([90,0,0])
-            {
-                translate([nock_width/2 - nock_radius,0,0]) 
-                    fillet(r = nock_radius, w = nock_length, center = true);
-                translate([-(nock_width/2 - nock_radius),0,0])
-                    mirror([1,0,0])  
-                        fillet(r = nock_radius, w = nock_length, center = true);
-            }
-        }
-}
-
 // Polyhole compensated cylinder (that cut's hole for the arrow into the base) for correct fit 
 // https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/undersized_circular_objects
 module cylinder_holer(height = 1,radius = 1,fn = 30){
@@ -307,7 +285,8 @@ module jig (    part_select = 0,
             }
         }
         if (nock == true)
-            nock_insert(nock_width, nock_depth, arrow_diameter, arrow_offset);
+            translate([0,0,arrow_offset + nock_depth/2])
+                cube([nock_width, arrow_diameter, nock_depth], true);
     }
 
     //arm
