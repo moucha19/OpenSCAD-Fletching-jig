@@ -1,5 +1,4 @@
 use <components.scad>
-use <hinge.scad>
 
 //Functions that create console messages
 module error_treshold (value_name, treshold_name, value, treshold)
@@ -126,6 +125,9 @@ module jig (    part_select = 0,
                 nock = false,
                 nock_width = 3,
                 nock_depth = 3,
+                hinge_style = "ball",
+                base_style = "polygon",
+                lid_style = "polygon",
                 fn = 30
              ) 
 {
@@ -221,6 +223,49 @@ module jig (    part_select = 0,
             "INVALID HINGE PARAMETERS"
     );
 
+    //Nested module definitions
+
+    //
+    //Module that can create both parts of the hinge by changing holer value
+    //# hinge_diameter - diameter of the cylinder that forms a joint; also depth of the hinge
+    //# hinge_pin - diameter of the sphere that connects two parts of the hinge together 
+    //# holer - if true, outline of the joint will be created and can be later subtracted from another solid, creating opening for hinge itself
+    //## hole_lip - adds extra depth to the holer, only useful for preview
+    //
+    module hinge (holer = true)
+    {
+        h = hinge_depth + arm_offset - hinge_radius;
+        w = !holer ? hinge_width - hinge_gap : hinge_width;
+        d = !holer ? hinge_diameter - hinge_gap : hinge_diameter;
+        pin = !holer && hinge_style == "ball" ? hinge_pin - hinge_gap : hinge_pin;
+        hole_lip = 1;
+        translate([0,w/2,0]) rotate([90,-90,0]) mirror([0,1,0])
+            difference()
+            {
+                union()
+                {
+                    translate([0,0,w]) sphere(d=pin);
+                    sphere(d=pin);
+                    cylinder(w,d=d, true);     
+                    translate([h/2,0,w/2]) cube([h,d,w], true);
+                    if (holer)
+                    {
+                        translate([-d/2,0,0]) 
+                            cube([h + d/2, d/2 + hole_lip, w]);
+                        if (hinge_style == "axel") 
+                            translate([0,0,-w]) cylinder( w*3, d=pin);
+                    }
+                }
+                if (!holer)
+                {
+                    translate([h/2 - hole_lip,0, w/2]) 
+                        cube([h + d, d + hole_lip, w - 2*hinge_thickness], true);
+                    if (hinge_style == "axel")
+                        translate([0,0,-w/2]) cylinder( w*2, d=pin);
+                }
+            }
+    }
+
     //base
     if (part_select == 1 || part_select == 0)
     union()
@@ -234,7 +279,7 @@ module jig (    part_select = 0,
             {
                 rotate(a=[0,0,i*rotation_by]) 
                     translate([(base_radius) - hinge_radius, 0, base_height - hinge_depth + hinge_radius]) 
-                            hinge (hinge_width, hinge_thickness, hinge_diameter, hinge_depth + arm_offset - hinge_radius, hinge_pin, true);
+                            hinge(true);
             }
         }
         if (nock == true)
@@ -301,7 +346,7 @@ module jig (    part_select = 0,
             }
         }
         translate([base_radius - hinge_radius, 0, base_height - hinge_depth + hinge_radius]) 
-                            hinge(hinge_width - hinge_gap, hinge_thickness, hinge_diameter - hinge_gap, hinge_depth + arm_offset - hinge_radius, hinge_pin - hinge_gap, false);
+                            hinge(false);
     }
 
     //lid

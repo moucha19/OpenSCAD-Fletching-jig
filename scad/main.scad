@@ -10,6 +10,14 @@ part_select_gui = 0; //[0:All, 1:Base only, 2:Arm only, 3:Lid only]
 part_select_cmd = -1;
 part_select = part_select_cmd < 0 ? part_select_gui : part_select_cmd;
 
+/* [Style] */
+// You can either have a snap-in ball joints a hole for external axel (like bolt or piece of filament).
+hinge_style = "ball"; // [ "ball", "axel" ]
+// Style of the base.
+base_style = "polygon"; // [ "polygon", "star" ]
+// Style of the lid.
+lid_style = "polygon"; // [ "polygon", "star" ]
+
 /* [Jig settings] */
 
 // Your arrow diameter. This number should be slightly bigger than the arrow itself to take into account the precision of your printer.
@@ -107,5 +115,8 @@ jig (
         helical_direction,
         nock,
         nock_width,
-        nock_depth
+        nock_depth,
+        hinge_style,
+        base_style,
+        lid_style
     );
