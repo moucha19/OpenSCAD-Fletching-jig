@@ -49,7 +49,7 @@ helical_adjust | horizontal distance between the bottom and top corner of the HE
 helical_direction | sign of the value determines left or right spin (+ left; - right) | 
 nock | if true a nock guide will be added |
 nock_width | width of the nock guide, smallest point of the arrow nock | 0 < arrow_diameter
-nock_depth | depth of nock in your arrow, this will be the height of the nock guide | 0 < (base_height - arrow_offset)
+nock_height | depth of nock in your arrow, this will be the height of the nock guide | 0 < (base_height - arrow_offset)
 
 ![](./doc/img/dimensions_1.png)
 ![](./doc/img/dimensions_2.png)

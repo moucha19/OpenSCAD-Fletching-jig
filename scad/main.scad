@@ -1,5 +1,6 @@
 use <fletching_jig.scad>
 
+/* [Rendering options] */
 
 // Quality of the generated round elements of the jig. Higher values will generate more polygons, smoother surfaces and slow down the computations.
 $fn=30; // [10:10:100]
@@ -10,7 +11,7 @@ part_select_gui = 0; //[0:All, 1:Base only, 2:Arm only, 3:Lid only]
 part_select_cmd = -1;
 part_select = part_select_cmd < 0 ? part_select_gui : part_select_cmd;
 
-/* [Style] */
+/* [Jig style] */
 // You can either have a snap-in ball joints a hole for external axle (like bolt or piece of filament).
 hinge_style = "ball"; // [ "ball":Ball joint, "axle":Axle ]
 // Style of the base.
@@ -18,7 +19,7 @@ base_style = "polygon"; // [ "polygon":Polygon, "star":Star ]
 // Style of the lid.
 lid_style = "polygon"; // [ "polygon":Polygon, "star":Star ]
 
-/* [Jig settings] */
+/* [Jig dimensions] */
 
 // Your arrow diameter. This number should be slightly bigger than the arrow itself to take into account the precision of your printer.
 arrow_diameter = 6;//[2:0.1:30]
@@ -50,18 +51,6 @@ arm_gap = 0.5;
 // Distance between the top of the base and bottom of the arm.
 arm_offset = 1.5;//[0.1:0.1:2]
 
-// Alignment guide for nocked arrows. For even vane count, you can select if you want to align nock with index vane, or if you prefer to align it between vanes for optimal clearance. 
-nock = "none"; // [ "none":Disabled, "static" : Index vane, "optimal":Optimal clearance]
-
-// Width of the nock (measure smallest point)
-nock_width = 3;//[1:0.1:5]
-
-// Depth of the nock (height of the nock guide)
-nock_depth = 4;//[1:0.1:10]
-
-// Nock diameter. If it is larger than the arrow diameter, it will be used for the hole in the base, otherwise it has no effect.
-nock_diameter = 0;//[2:0.1:30]
-
 /* [Fletching] */
 
 //Select vane style
@@ -79,8 +68,22 @@ vane_width = 1.1;//[0:0.1:10]
 // How far from the end of arrow will the vane be. The minimal value will depend on the arrow offset, the base height and the arm offset.
 vane_offset = 25.1;//[0:0.1:200]
 
-// Offset of the fletching in degrees. The maximum value will depend on the arrow radius, the fletching width, the fletching length as well as the arm gap. This value is ignored if the helical option is chosen.
-vane_turn = 0;// [-30:0.1:30]
+// Offset of the fletching in degrees. The maximum value will depend on the arrow radius, the fletching width, the fletching length as well as the arm gap.
+vane_turn = 0;//[-30:0.1:30]
+
+/* [Nock alignment] */
+
+// Alignment guide for nocked arrows. For even vane count, you can select if you want to align nock with index vane, or if you prefer to align it between vanes for optimal clearance. 
+nock = "none"; // [ "none":Disabled, "static" : Index vane, "optimal":Optimal clearance]
+
+// Width of the nock (measure smallest point)
+nock_width = 3;//[0:0.1:5]
+
+// Depth of the nock groove (height of the nock guide)
+nock_height = 4;//[0:0.1:20]
+
+// Nock diameter. If it is larger than the arrow diameter, it will be used for the hole in the base, otherwise it has no effect.
+nock_diameter = 0;//[2:0.1:30]
 
 // Verbose info for command line rendering
 if (part_select_cmd != -1)
@@ -110,7 +113,7 @@ jig (
         vane_turn,
         nock,
         nock_width,
-        nock_depth,
+        nock_height,
         nock_diameter,
         hinge_style,
         base_style,

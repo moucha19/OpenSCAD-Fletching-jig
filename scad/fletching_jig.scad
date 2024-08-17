@@ -107,7 +107,7 @@ module cylinder_holer(height = 1,radius = 1,fn = 30){
 //# helical_direction - sign of the value determines left or right spin (+ left; - right)
 //# nock - boolean (true/false) if nock should be added
 //# nock_width - gap size of the nock
-//# nock_depth - the height you want the nock guide to be
+//# nock_height - the height you want the nock guide to be
 //
 module jig (    part_select = 0,
                 arrow_diameter = 6,
@@ -128,12 +128,12 @@ module jig (    part_select = 0,
                 vane_turn = 0,
                 nock = "none",
                 nock_width = 3,
-                nock_depth = 4,
+                nock_height = 4,
                 nock_diameter = 0,
                 hinge_style = "ball",
                 base_style = "polygon",
                 lid_style = "polygon",
-                fn = 30
+                fn = $fn
              ) 
 {
     //independent internal variables
@@ -145,7 +145,7 @@ module jig (    part_select = 0,
     //input corrections and tresholds
     min_arrow_diameter = 2;
     arrow_diameter = abs(arrow_diameter) >= min_arrow_diameter ? abs(arrow_diameter) : min_arrow_diameter;
-    arrow_diameter_base = max(arrow_diameter, nock_diameter);
+    arrow_diameter_base = nock != "none" ? max(arrow_diameter, nock_diameter) : arrow_diameter;
 
     min_base_height = 5;
     base_height = base_height >= min_base_height ? base_height : min_base_height;
@@ -187,7 +187,7 @@ module jig (    part_select = 0,
 
     min_vane_offset = (base_height - arrow_offset) + arm_offset + 4;  
     vane_offset = vane_offset >= min_vane_offset ? vane_offset : min_vane_offset;
-    nock_depth = abs(nock_depth) <= base_height - arrow_offset ? abs(nock_depth) : base_height - arrow_offset;
+    nock_height = abs(nock_height) <= base_height - arrow_offset ? abs(nock_height) : base_height - arrow_offset;
     nock_width = abs(nock_width) <= arrow_diameter ? abs(nock_width) : arrow_diameter;
 
     //dependent internal variables
@@ -228,7 +228,7 @@ module jig (    part_select = 0,
     error_treshold ("vane_offset", "min", vane_offset, min_vane_offset);
     error_treshold ("arrow_offset", "max", arrow_offset, base_height);
     error_treshold ("arm_gap", "max", abs(arm_gap), max_arm_gap);
-    error_treshold ("nock_depth", "max", nock_depth, base_height - arrow_offset);
+    error_treshold ("nock_height", "max", nock_height, base_height - arrow_offset);
     error_treshold ("nock_width", "max", nock_width, arrow_diameter);
 
     assert (min_hinge_width <= max_hinge_width && min_hinge_thickness <= max_hinge_thickness,
@@ -239,10 +239,7 @@ module jig (    part_select = 0,
 
     //
     //Module that can create both parts of the hinge by changing holer value
-    //# hinge_diameter - diameter of the cylinder that forms a joint; also depth of the hinge
-    //# hinge_pin - diameter of the sphere that connects two parts of the hinge together 
     //# holer - if true, outline of the joint will be created and can be later subtracted from another solid, creating opening for hinge itself
-    //## hole_lip - adds extra depth to the holer, only useful for preview
     //
     module hinge (holer = true)
     {
@@ -295,9 +292,9 @@ module jig (    part_select = 0,
             }
         }
         if (nock != "none")
-            translate([0,0,arrow_offset + nock_depth/2])
+            translate([0,0,arrow_offset + nock_height/2])
                 rotate([0,0,nock == "optimal" && vane_count%2 == 0 && vane_count > 2 ? rotation_by/2 : 0])
-                    cube([nock_width, arrow_diameter_base, nock_depth], true);
+                    cube([nock_width, arrow_diameter_base, nock_height], true);
     }
 
     //arm
@@ -379,13 +376,13 @@ module jig (    part_select = 0,
             difference()
             {
                 offset(delta=lid_thickness) base_outline(lid_style, w, r, vane_count);
-                base_outline(lid_style, w, r, vane_count);
+                base_outline("star", w, r, vane_count);
             }
         linear_extrude(lid_thickness) 
             difference()
             {
                 base_outline(lid_style, w, r, vane_count);
-                offset(delta=-lid_lip) base_outline(lid_style, w, r, vane_count);
+                offset(delta=-lid_lip) base_outline("star", w, r, vane_count);
             }
     }
 }
