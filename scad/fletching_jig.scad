@@ -4,11 +4,21 @@ use <components.scad>
 module error_treshold (value_name, treshold_name, value, treshold)
 {
     if (value == treshold) 
-        echo(str("<font color='red'>", value_name," treshold (", treshold_name, " = ", treshold, ") reached!</font>"));
+    {
+        message = str(value_name," treshold (", treshold_name, " = ", treshold, ") reached!");
+        if (version()[0] > 2019)
+            echo(message);
+        else
+            echo(str("<font color='red'>", message, "</font>"));
+    }
 }
 module info_treshold (value_name, treshold_name, treshold)
 {
-    echo(str("<font color='blue'>Current ", treshold_name, " for ", value_name, " is ", treshold, "</font>"));
+    message = str("Current ", treshold_name, " for ", value_name, " is ", treshold);
+    if (version()[0] > 2019)
+        echo(message);
+    else
+        echo(str("<font color='blue'>", message, "</font>"));
 }
 
 //
