@@ -64,6 +64,9 @@ nock_diameter = 0;//[2:0.1:30]
 
 /* [Fletching] */
 
+//Select vane style
+vane_style = "straight";//["straight":Straight, "helical":Helical]
+
 // Number of vanes.
 vane_count = 3;//[2:1:5]
 
@@ -76,17 +79,8 @@ vane_width = 1.1;//[0:0.1:10]
 // How far from the end of arrow will the vane be. The minimal value will depend on the arrow offset, the base height and the arm offset.
 vane_offset = 25.1;//[0:0.1:200]
 
-//Select vane style
-helical = 0;//[0:Offset, 1:Helical]
-
 // Offset of the fletching in degrees. The maximum value will depend on the arrow radius, the fletching width, the fletching length as well as the arm gap. This value is ignored if the helical option is chosen.
 vane_turn = 0;// [-30:0.1:30]
-
-// Horizontal distance between the bottom and top corner of the helical vane. This value is only used if helical fletching is enabled. The maximum value depends on the arrow radius and the arm gap.
-helical_adjust = 3.5; //[0:0.1:30]
-
-// Direction of the helical fletching and thus the arrow spin direction.
-helical_direction = 1;//[1:Left, -1:Right]
 
 // Verbose info for command line rendering
 if (part_select_cmd != -1)
@@ -108,14 +102,12 @@ jig (
         hinge_pin,
         arm_gap,
         arm_offset,
+        vane_style,
         vane_count,
         vane_length,
         vane_width,
         vane_offset,
         vane_turn,
-        helical,
-        helical_adjust,
-        helical_direction,
         nock,
         nock_width,
         nock_depth,

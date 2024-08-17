@@ -9,7 +9,7 @@ use <MCAD/regular_shapes.scad>
 module bezier (p0, p1, p2, w)
 {
     deltat = 0.02;
-    cline = [for (t=[0:deltat:1+deltat]) pow(1-t,2)*p0+2*(1-t)*t*p1+pow(t,2)*p2];
+    cline = [for (t=[0:deltat:1]) pow(1-t,2)*p0+2*(1-t)*t*p1+pow(t,2)*p2];
     last = len(cline) - 1;
     rline = [for(i = [0 : last]) [cline[i].x, cline[i].y - w/2]];
     lline_rev = [for(i = [len(cline) - 1 : -1 : 0]) [cline[i].x, cline[i].y + w/2]];

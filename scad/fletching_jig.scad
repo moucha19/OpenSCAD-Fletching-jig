@@ -30,7 +30,7 @@ module info_treshold (value_name, treshold_name, treshold)
 module helical_vane (width = 1, length = 75, height = 10, spread = 4, twist = 15, direction = 1)
 {
     direction = sign(direction);
-    length = length - width;
+    length = length;
     rotate([0,90,0])
         linear_extrude(height, center = false, twist = -direction*twist, scale = 1)
             translate([-length/2,0,0])
@@ -120,14 +120,12 @@ module jig (    part_select = 0,
                 hinge_pin = 3,
                 arm_gap = 0.5,         
                 arm_offset = 1.5,
+                vane_style = "straight",
                 vane_count = 3,
                 vane_length = 75, 
                 vane_width = 1.1, 
                 vane_offset = 25,
                 vane_turn = 0,
-                helical = 0,
-                helical_adjust = 3.5,
-                helical_direction = 1,
                 nock = "none",
                 nock_width = 3,
                 nock_depth = 4,
@@ -321,7 +319,7 @@ module jig (    part_select = 0,
             translate([0,0,base_height]) 
                 cylinder(arm_height + base_height,d=arrow_diameter, true);
             //vane
-            if (helical == 0)
+            if (vane_style == "straight")
             {
                 translate([base_radius/2,0, vane_length/2 + arrow_offset + vane_offset])
                     rotate([vane_turn,0,0])
@@ -333,19 +331,18 @@ module jig (    part_select = 0,
                 //t - values from 0 to maximum spread (side of equilateral triangle in circumscribed cirle)
                 //x - distance from center to arm based on t
                 r = arrow_radius+arm_gap-0.35;
-                t = helical_adjust < (r * sqrt(3)) ? helical_adjust/2 : (r * sqrt(3))/2;
+                t = (vane_length/2) * sin(abs(vane_turn));
                 x = sqrt(pow(r,2) - pow(t*2,2)/4);
                 t_outer = (base_radius)*(t/x);
                 twist = 2*(atan(t_outer/vane_length/2) - atan(t/vane_length/2));
 
-                error_treshold ("helical_adjust", "max", t*2, r * sqrt(3));
                 translate([x,0, vane_length/2 + arrow_offset + vane_offset])
                     helical_vane(width = vane_width,
                                     length = vane_length,
                                     height = base_radius - x + 0.01,
-                                    spread = t - vane_width/2,
+                                    spread = t,
                                     twist = twist,
-                                    direction = helical_direction);
+                                    direction = sign(vane_turn));
             }
 
             //vane foot cutout
@@ -376,8 +373,8 @@ module jig (    part_select = 0,
     union()
     {
         h = vane_offset-arm_offset-(base_height - arrow_offset) + lid_thickness;
-        w = arm_width + 2*lid_gap;
-        r = base_radius + lid_gap;
+        w = arm_width + lid_gap;
+        r = base_radius + lid_gap/2;
         linear_extrude(h) 
             difference()
             {
