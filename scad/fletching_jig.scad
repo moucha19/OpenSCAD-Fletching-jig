@@ -115,7 +115,7 @@ module jig (    part_select = 0,
                 vane_width = 1.1, 
                 vane_offset = 25,
                 vane_turn = 0,
-                helical = false,
+                helical = 0,
                 helical_adjust = 3.5,
                 helical_direction = 1,
                 nock = "none",
@@ -137,6 +137,7 @@ module jig (    part_select = 0,
     //input corrections and tresholds
     min_arrow_diameter = 2;
     arrow_diameter = abs(arrow_diameter) >= min_arrow_diameter ? abs(arrow_diameter) : min_arrow_diameter;
+    arrow_diameter_base = max(arrow_diameter, nock_diameter);
 
     min_base_height = 5;
     base_height = base_height >= min_base_height ? base_height : min_base_height;
@@ -152,7 +153,7 @@ module jig (    part_select = 0,
 
     min_hinge_thickness = 1;
     min_hinge_width = 2*min_hinge_thickness + hinge_gap;
-    max_hinge_width = (arrow_diameter + hinge_to_arrow_gap)*tan(180/vane_count) - 2*min_wall; //length of the side of polygon aroung arrow hole, minus min_wall
+    max_hinge_width = (arrow_diameter_base + hinge_to_arrow_gap)*tan(180/vane_count) - 2*min_wall; //length of the side of polygon aroung arrow hole, minus min_wall
     hinge_width     = abs(hinge_width) >= min_hinge_width 
                         ? (abs(hinge_width) <= max_hinge_width ? abs(hinge_width) : max_hinge_width) 
                         : min_hinge_width;
@@ -170,8 +171,8 @@ module jig (    part_select = 0,
     max_arm_gap = 1.5;
     arm_gap = abs(arm_gap) <= max_arm_gap ? arm_gap : max_arm_gap;
 
+    vane_count = abs(vane_count) >= 2 ? abs(vane_count) : 2;
     vane_width = abs(vane_width);
-
     vane_length = abs(vane_length);
 
     arm_offset = abs(arm_offset);
@@ -182,8 +183,7 @@ module jig (    part_select = 0,
     nock_width = abs(nock_width) <= arrow_diameter ? abs(nock_width) : arrow_diameter;
 
     //dependent internal variables
-    base_hole_diameter = max(arrow_diameter, nock_diameter);
-    base_diameter = base_hole_diameter + 2*hinge_diameter + hinge_to_arrow_gap;
+    base_diameter = arrow_diameter_base + 2*hinge_diameter + hinge_to_arrow_gap;
     base_radius = base_diameter/2;
     arrow_radius = arrow_diameter/2;
     hinge_radius = hinge_diameter/2;
@@ -277,7 +277,7 @@ module jig (    part_select = 0,
         difference()
         {
             linear_extrude(base_height) base_outline(base_style, arm_width, base_radius, vane_count);
-            translate([0,0,arrow_offset]) cylinder_holer(height = base_height,radius = base_hole_diameter/2,fn = fn);
+            translate([0,0,arrow_offset]) cylinder_holer(height = base_height,radius = arrow_diameter_base/2,fn = fn);
             //hinge holer
             for (i = [0:vane_count-1]) 
             {
@@ -289,7 +289,7 @@ module jig (    part_select = 0,
         if (nock != "none")
             translate([0,0,arrow_offset + nock_depth/2])
                 rotate([0,0,nock == "optimal" && vane_count%2 == 0 && vane_count > 2 ? rotation_by/2 : 0])
-                    cube([nock_width, base_hole_diameter, nock_depth], true);
+                    cube([nock_width, arrow_diameter_base, nock_depth], true);
     }
 
     //arm
