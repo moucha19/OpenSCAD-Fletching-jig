@@ -180,7 +180,6 @@ module jig (    part_select = 0,
     arm_gap = abs(arm_gap) <= max_arm_gap ? arm_gap : max_arm_gap;
 
     vane_count = abs(vane_count) >= 2 ? abs(vane_count) : 2;
-    vane_width = abs(vane_width);
     vane_length = abs(vane_length);
 
     arm_offset = abs(arm_offset);
@@ -190,7 +189,6 @@ module jig (    part_select = 0,
     nock_height = abs(nock_height) <= base_height - arrow_offset ? abs(nock_height) : base_height - arrow_offset;
     nock_width = abs(nock_width) <= arrow_diameter ? abs(nock_width) : arrow_diameter;
 
-    //dependent internal variables
     base_diameter = arrow_diameter_base + 2*hinge_diameter + hinge_to_arrow_gap;
     base_radius = base_diameter/2;
     arrow_radius = arrow_diameter/2;
@@ -205,15 +203,18 @@ module jig (    part_select = 0,
     arm_width = hinge_width + (joint_style == "pin" ? max(arm_fill, hinge_to_arrow_gap) : max(arm_fill, joint_diameter + 2*min_gap));
     rotation_by = 360/vane_count;
 
+    max_vane_width = 2*(arm_gap+arrow_radius)*sin(rotation_by/2);
+    vane_width = abs(vane_width) <= max_vane_width ? abs(vane_width) : max_vane_width;
+
     //max vane turn limit calculation
-    max_vane_spread = 2*(arm_gap+arrow_radius)*sin(rotation_by/2) - vane_width;
+    max_vane_spread = max_vane_width - vane_width;
     max_vane_turn = asin(max_vane_spread/vane_length);
     vane_turn = abs(vane_turn) <= max_vane_turn ? vane_turn : sign(vane_turn)*max_vane_turn;
-    error_treshold ("vane_turn", "max", abs(vane_turn), max_vane_turn);
 
     //error report
     info_treshold ("vane_offset", "minimal value", min_vane_offset);
     info_treshold ("vane_turn", "maximum angle", max_vane_turn);
+    info_treshold ("vane_width", "maximum width", max_vane_width);
 
     error_treshold ("arrow_diameter", "min", arrow_diameter, min_arrow_diameter);
     error_treshold ("base_height", "min", base_height, min_base_height);
@@ -227,6 +228,8 @@ module jig (    part_select = 0,
     error_treshold ("hinge_thickness", "max", hinge_thickness, max_hinge_thickness);
     error_treshold ("joint_diameter", "max", joint_diameter, max_joint_diameter);
     error_treshold ("vane_offset", "min", vane_offset, min_vane_offset);
+    error_treshold ("vane_width", "max", vane_width, max_vane_width);
+    error_treshold ("vane_turn", "max", abs(vane_turn), max_vane_turn);
     error_treshold ("arrow_offset", "max", arrow_offset, base_height);
     error_treshold ("arm_gap", "max", abs(arm_gap), max_arm_gap);
     error_treshold ("nock_height", "max", nock_height, base_height - arrow_offset);
