@@ -34,7 +34,7 @@ arrow_diameter | slightly bigger than the arrow itself (may vary depending on yo
 arrow_offset | distance between the bottom of the base and arrow | 0 < ■ < base_height 
 base_height | height of the base | 5 < ■
 hinge_width | width of the hinge cutout on the base | 2.1 < ■ < *depends on arrow_diameter*
-hinge_thickness | thickness of the hinge extension attached to the bottom of the arm | 1 < ■ < *depends on hinge_width*
+hinge_thickness | thickness of the hinge extension attached to the bottom of the arm | 1 < ■ < *depends on hinge_width and joint_diameter*
 hinge_diameter | diameter of the circular part of the hinge that forms a joint | 2 < ■ < hinge_depth
 hinge_depth | how deep into the base is the hinge cutout | 5 < ■ < base_height
 joint_diameter | diameter of the joint that connects two halves of the hinge together | 0 < ■ < *depends on joint_style*

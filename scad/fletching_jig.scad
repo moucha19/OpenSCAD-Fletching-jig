@@ -137,9 +137,9 @@ module jig (    part_select = 0,
              ) 
 {
     //independent internal variables
-    hinge_gap = 0.1;
+    hinge_gap = 0.2;
     hinge_to_arrow_gap = 2;
-    min_wall = 0.6;
+    min_gap = 0.6;
     flag_showAll = part_select == 0 ? 0 : 1; 
 
     //input corrections and tresholds
@@ -161,18 +161,18 @@ module jig (    part_select = 0,
 
     min_hinge_thickness = 1;
     min_hinge_width = 2*min_hinge_thickness + hinge_gap;
-    max_hinge_width = (arrow_diameter_base + hinge_to_arrow_gap)*tan(180/vane_count) - 2*min_wall; //length of the side of polygon aroung arrow hole, minus min_wall
+    max_hinge_width = (arrow_diameter_base + hinge_to_arrow_gap)*tan(180/vane_count) - 2*min_gap; //length of the side of polygon aroung arrow hole, minus min_gap
     hinge_width     = abs(hinge_width) >= min_hinge_width 
                         ? (abs(hinge_width) <= max_hinge_width ? abs(hinge_width) : max_hinge_width) 
                         : min_hinge_width;
 
-    max_hinge_thickness = (hinge_width-hinge_gap)/2;
+    max_joint_diameter = min(hinge_diameter, hinge_width - hinge_gap - 2*min_hinge_thickness);
+    joint_diameter = abs(joint_diameter) <= max_joint_diameter ? abs(joint_diameter) : max_joint_diameter;
+
+    max_hinge_thickness = joint_style == "ball" ? (hinge_width-hinge_gap-joint_diameter)/2 : (hinge_width-hinge_gap)/2;
     hinge_thickness = abs(hinge_thickness) >= min_hinge_thickness
                         ? (abs(hinge_thickness) <= max_hinge_thickness ? abs(hinge_thickness) : max_hinge_thickness) 
                         : min_hinge_thickness;
-
-    max_joint_diameter = min(hinge_diameter, hinge_width - hinge_gap - 2*hinge_thickness);
-    joint_diameter = abs(joint_diameter) <= max_joint_diameter ? abs(joint_diameter) : max_joint_diameter;
 
     arrow_offset = abs(arrow_offset) <= base_height ? abs(arrow_offset) : base_height;
 
@@ -202,11 +202,12 @@ module jig (    part_select = 0,
     hinge_secondary_angle = base_outline_angles(hinge_width, base_radius - hinge_diameter, vane_count)[1];
     arm_fill = (2 * sin(hinge_secondary_angle/2) * hinge_corner_radius) * cos(180-interior_angle) * 2;
 
-    arm_width = hinge_width + (joint_style == "pin" ? max(arm_fill, hinge_to_arrow_gap) : max(arm_fill, joint_diameter + 2*min_wall));
+    arm_width = hinge_width + (joint_style == "pin" ? max(arm_fill, hinge_to_arrow_gap) : max(arm_fill, joint_diameter + 2*min_gap));
     rotation_by = 360/vane_count;
 
     //max vane turn limit calculation
-    max_vane_turn = atan((((arrow_radius+arm_gap)*sqrt(3))/2 - vane_width/2)/(vane_length/2));
+    max_vane_spread = 2*(arm_gap+arrow_radius)*sin(rotation_by/2) - vane_width;
+    max_vane_turn = asin(max_vane_spread/vane_length);
     vane_turn = abs(vane_turn) <= max_vane_turn ? vane_turn : sign(vane_turn)*max_vane_turn;
     error_treshold ("vane_turn", "max", abs(vane_turn), max_vane_turn);
 
