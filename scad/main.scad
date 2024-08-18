@@ -90,7 +90,8 @@ if (part_select_cmd != -1)
 {
     echo(str("Selected part = ", part_select));
     echo(str("Arrow diameter = ", arrow_diameter));
-    echo(str("Vane turn style = ", helical == 1 ? "Helical" : "Offset"));
+    echo(str("Vane style = ", vane_style == "helical" ? "Helical" : "Straight"));
+    echo(str("Vane turn = ", vane_turn));
 }
 
 jig (
