@@ -1,16 +1,24 @@
 use <components.scad>
-use <hinge.scad>
-use <MCAD/regular_shapes.scad>
 
 //Functions that create console messages
-module error_treshold (value_name, treshold_name, value, treshold)
+module error_threshold (value_name, threshold_name, value, threshold)
 {
-    if (value == treshold) 
-        echo(str("<font color='red'>", value_name," treshold (", treshold_name, " = ", treshold, ") reached!</font>"));
+    if (value == threshold) 
+    {
+        message = str(value_name," threshold (", threshold_name, " = ", threshold, ") reached!");
+        if (version()[0] > 2019)
+            echo(message);
+        else
+            echo(str("<font color='red'>", message, "</font>"));
+    }
 }
-module info_treshold (value_name, treshold_name, treshold)
+module info_threshold (value_name, threshold_name, threshold)
 {
-    echo(str("<font color='blue'>Current ", treshold_name, " for ", value_name, " is ", treshold, "</font>"));
+    message = str("Current ", threshold_name, " for ", value_name, " is ", threshold);
+    if (version()[0] > 2019)
+        echo(message);
+    else
+        echo(str("<font color='blue'>", message, "</font>"));
 }
 
 //
@@ -22,7 +30,7 @@ module info_treshold (value_name, treshold_name, treshold)
 module helical_vane (width = 1, length = 75, height = 10, spread = 4, twist = 15, direction = 1)
 {
     direction = sign(direction);
-    length = length - width;
+    length = length;
     rotate([0,90,0])
         linear_extrude(height, center = false, twist = -direction*twist, scale = 1)
             translate([-length/2,0,0])
@@ -31,42 +39,45 @@ module helical_vane (width = 1, length = 75, height = 10, spread = 4, twist = 15
 
 //
 //Creates basic shape of the jig's base
+//# a - style of the outline
+//# a - length of primary side
+//# radius - distance from center to midpoint of primary side (apothem)
+//# vane_count - number of vanes
 //
-module base_mold (a = 8, radius = 15, height = 20, hulled=false) {
-    module base_triangle(a, radius, height){ 
-        for (i = [0:3]) 
-        {
-            rotate(a=[0,0,i*120]) translate([0,-a/2,0]) 
-                cube([radius, a, height], false);
-        }
-    }
-    if (hulled)
-      hull() base_triangle(a, radius, height);
-    else
-      base_triangle(a, radius, height);
+module base_outline (style, a, radius, vane_count)
+{
+    rotation_by = 360/vane_count;
+    or = sqrt(pow(a/2, 2) + pow(radius, 2)); //? outside radius
+    alpha = atan((a/2)/radius); //? half angle of the hinge side
+    beta = (rotation_by - 2*alpha)/2; //? half angle of the secondary side
+    b = 2 * or * sin(beta); //? secondary side length
+    cross_radius = (or * cos(beta)) - ((b/2)*tan((180-rotation_by)/2));
+
+    points = [for (i=[0:rotation_by:360-rotation_by]) 
+        if (style == "star") 
+            each 
+            [
+                [cos(i - alpha)*or, sin(i - alpha)*or],
+                [cos(i + alpha)*or, sin(i + alpha)*or],
+                [cos(i + alpha + beta)*cross_radius, sin(i + alpha + beta)*cross_radius]
+            ]
+        else
+            each 
+            [
+                [cos(i - alpha)*or, sin(i - alpha)*or],
+                [cos(i + alpha)*or, sin(i + alpha)*or],
+            ]
+    ];
+    polygon(points);
 }
 
 //
-// Create nock alignment
+//Calculates primary and secondary angle of the polygon that encompasses base outline
 //
-module nock_insert (nock_width, nock_depth, arrow_diameter, arrow_offset)
-{
-    nock_radius = (nock_width >= 2) ? 1 : nock_width / 2;
-    nock_length = arrow_diameter;
-    translate([0,0,arrow_offset + nock_depth/2])
-        difference() 
-        {
-            cube([nock_width, nock_length, nock_depth], true);
-            translate([0,0,nock_depth/2 - nock_radius]) rotate ([90,0,0])
-            {
-                translate([nock_width/2 - nock_radius,0,0]) 
-                    fillet(r = nock_radius, w = nock_length, center = true);
-                translate([-(nock_width/2 - nock_radius),0,0])
-                    mirror([1,0,0])  
-                        fillet(r = nock_radius, w = nock_length, center = true);
-            }
-        }
-}
+function base_outline_angles(a, radius, vane_count) = [
+    2*atan((a/2)/(radius)),
+    (360 - vane_count*(2*atan((a/2)/(radius))))/vane_count
+];
 
 // Polyhole compensated cylinder (that cut's hole for the arrow into the base) for correct fit 
 // https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/undersized_circular_objects
@@ -84,8 +95,7 @@ module cylinder_holer(height = 1,radius = 1,fn = 30){
 //# hinge_thickness - thickness of the hinge extension attached to the bottom of the arm
 //# hinge_diameter - diameter of the circular part of the hinge that forms a joint
 //# hinge_depth - how deep into the base is the hinge cutout
-//# hinge_pin - diameter of the sphere that connects two halves of the hinge together
-//# hinge_style - make a hole so you can put a pin through to hold the hinge together, or ball joint that requires no pin
+//# joint_diameter - diameter of the sphere that connects two halves of the hinge together 
 //# arm_gap - gap for the vane foot, so that tension during clamping is distributed evenly
 //# arm_offset - distance between the top of the base and bottom of the arm
 //# vane_length - length of the vane
@@ -97,8 +107,7 @@ module cylinder_holer(height = 1,radius = 1,fn = 30){
 //# helical_direction - sign of the value determines left or right spin (+ left; - right)
 //# nock - boolean (true/false) if nock should be added
 //# nock_width - gap size of the nock
-//# nock_depth - the height you want the nock guide to be
-//# hulled_base - rounds the corners of the base and lid - makes more of a hexagonal shape not tricorn
+//# nock_height - the height you want the nock guide to be
 //
 module jig (    part_select = 0,
                 arrow_diameter = 6,
@@ -108,34 +117,35 @@ module jig (    part_select = 0,
                 hinge_thickness = 1.5, 
                 hinge_diameter = 5,
                 hinge_depth = 10,
-                hinge_pin = 3,
+                joint_diameter = 3,
                 arm_gap = 0.5,         
                 arm_offset = 1.5,
+                vane_style = "straight",
+                vane_count = 3,
                 vane_length = 75, 
                 vane_width = 1.1, 
                 vane_offset = 25,
                 vane_turn = 0,
-                helical = false,
-                helical_adjust = 3.5,
-                helical_direction = 1,
-                nock = false,
+                nock = "none",
                 nock_width = 3,
-                nock_depth = 3,
-                nock_diameter = 6,
-                base_style = "hexagon",
-                hinge_style = "ball joint",
-                fn = 30
+                nock_height = 4,
+                nock_diameter = 0,
+                joint_style = "ball",
+                base_style = "polygon",
+                lid_style = "polygon",
+                fn = $fn
              ) 
 {
     //independent internal variables
-    hinge_gap = 0.1;
+    hinge_gap = 0.2;
+    hinge_to_arrow_gap = 2;
+    min_gap = 0.6;
     flag_showAll = part_select == 0 ? 0 : 1; 
-    hulled_base = base_style == "hexagon" ? true : false;
-    hinge_holes = hinge_style == "ball joint" ? false : true;
 
-    //input corrections and tresholds
+    //input corrections and thresholds
     min_arrow_diameter = 2;
     arrow_diameter = abs(arrow_diameter) >= min_arrow_diameter ? abs(arrow_diameter) : min_arrow_diameter;
+    arrow_diameter_base = nock != "none" ? max(arrow_diameter, nock_diameter) : arrow_diameter;
 
     min_base_height = 5;
     base_height = base_height >= min_base_height ? base_height : min_base_height;
@@ -151,73 +161,126 @@ module jig (    part_select = 0,
 
     min_hinge_thickness = 1;
     min_hinge_width = 2*min_hinge_thickness + hinge_gap;
-    max_hinge_width = (3*arrow_diameter)/sqrt(3); //inscribed circle in equilateral triangle formula
+    max_hinge_width = (arrow_diameter_base + hinge_to_arrow_gap)*tan(180/vane_count) - 2*min_gap; //length of the side of polygon aroung arrow hole, minus min_gap
     hinge_width     = abs(hinge_width) >= min_hinge_width 
                         ? (abs(hinge_width) <= max_hinge_width ? abs(hinge_width) : max_hinge_width) 
                         : min_hinge_width;
 
-    max_hinge_thickness = (hinge_width-hinge_gap)/2;
+    max_joint_diameter = joint_style == "ball" ? min(hinge_diameter - 2*min_gap, hinge_width - hinge_gap - 2*min_hinge_thickness) : hinge_diameter - 2*min_gap;
+    joint_diameter = abs(joint_diameter) <= max_joint_diameter ? abs(joint_diameter) : max_joint_diameter;
+
+    max_hinge_thickness = joint_style == "ball" ? (hinge_width-hinge_gap-joint_diameter)/2 : (hinge_width-hinge_gap)/2;
     hinge_thickness = abs(hinge_thickness) >= min_hinge_thickness
                         ? (abs(hinge_thickness) <= max_hinge_thickness ? abs(hinge_thickness) : max_hinge_thickness) 
                         : min_hinge_thickness;
-
-    max_hinge_pin = min(hinge_diameter, hinge_width - hinge_gap - 2*hinge_thickness);
-    hinge_pin = abs(hinge_pin) <= max_hinge_pin ? abs(hinge_pin) : max_hinge_pin;
 
     arrow_offset = abs(arrow_offset) <= base_height ? abs(arrow_offset) : base_height;
 
     max_arm_gap = 1.5;
     arm_gap = abs(arm_gap) <= max_arm_gap ? arm_gap : max_arm_gap;
 
-    vane_width = abs(vane_width);
-
+    vane_count = abs(vane_count) >= 2 ? abs(vane_count) : 2;
     vane_length = abs(vane_length);
 
     arm_offset = abs(arm_offset);
 
     min_vane_offset = (base_height - arrow_offset) + arm_offset + 4;  
     vane_offset = vane_offset >= min_vane_offset ? vane_offset : min_vane_offset;
-    nock_depth = abs(nock_depth) <= base_height - arrow_offset ? abs(nock_depth) : base_height - arrow_offset;
+    nock_height = abs(nock_height) <= base_height - arrow_offset ? abs(nock_height) : base_height - arrow_offset;
     nock_width = abs(nock_width) <= arrow_diameter ? abs(nock_width) : arrow_diameter;
 
-    //dependent internal variables
-    base_diameter = arrow_diameter + 2*hinge_diameter + 2;
+    base_diameter = arrow_diameter_base + 2*hinge_diameter + hinge_to_arrow_gap;
     base_radius = base_diameter/2;
     arrow_radius = arrow_diameter/2;
     hinge_radius = hinge_diameter/2;
     arm_height = vane_length + 2*(vane_offset-arm_offset-(base_height - arrow_offset));
-    arm_width = hinge_width + hinge_pin + 3;
+    
+    interior_angle = (2*vane_count - 2)*180/(2*vane_count);
+    hinge_corner_radius = sqrt(pow(base_radius-hinge_diameter,2) + pow(hinge_width/2,2));
+    hinge_secondary_angle = base_outline_angles(hinge_width, base_radius - hinge_diameter, vane_count)[1];
+    arm_fill = (2 * sin(hinge_secondary_angle/2) * hinge_corner_radius) * cos(180-interior_angle) * 2;
+
+    arm_width = hinge_width + (joint_style == "pin" ? max(arm_fill, hinge_to_arrow_gap) : max(arm_fill, joint_diameter + 2*min_gap));
+    rotation_by = 360/vane_count;
+
+    max_vane_width = 2*(arm_gap+arrow_radius)*sin(rotation_by/2);
+    vane_width = abs(vane_width) <= max_vane_width ? abs(vane_width) : max_vane_width;
 
     //max vane turn limit calculation
-    max_vane_turn = atan((((arrow_radius+arm_gap)*sqrt(3))/2 - vane_width/2)/(vane_length/2));
+    max_vane_spread = max_vane_width - vane_width;
+    max_vane_turn = asin(max_vane_spread/vane_length);
     vane_turn = abs(vane_turn) <= max_vane_turn ? vane_turn : sign(vane_turn)*max_vane_turn;
-    error_treshold ("vane_turn", "max", abs(vane_turn), max_vane_turn);
 
     //error report
-    info_treshold ("vane_offset", "minimal value", min_vane_offset);
-    info_treshold ("vane_turn", "maximum angle", max_vane_turn);
+    info_threshold ("vane_offset", "minimal value", min_vane_offset);
+    info_threshold ("vane_turn", "maximum angle", max_vane_turn);
+    info_threshold ("vane_width", "maximum width", max_vane_width);
 
-    error_treshold ("arrow_diameter", "min", arrow_diameter, min_arrow_diameter);
-    error_treshold ("base_height", "min", base_height, min_base_height);
-    error_treshold ("hinge_depth", "min", hinge_depth, min_base_height);
-    error_treshold ("hinge_diameter", "min", hinge_diameter, min_hinge_diameter);
-    error_treshold ("hinge_diameter", "max", hinge_diameter, hinge_depth);
-    error_treshold ("hinge_depth", "max", hinge_depth, base_height);
-    error_treshold ("hinge_width", "min", hinge_width, min_hinge_width);
-    error_treshold ("hinge_width", "max", hinge_width, max_hinge_width);
-    error_treshold ("hinge_thickness", "min", hinge_thickness, min_hinge_thickness);
-    error_treshold ("hinge_thickness", "max", hinge_thickness, max_hinge_thickness);
-    error_treshold ("hinge_pin", "max", hinge_pin, max_hinge_pin);
-    error_treshold ("vane_offset", "min", vane_offset, min_vane_offset);
-    error_treshold ("arrow_offset", "max", arrow_offset, base_height);
-    error_treshold ("arm_gap", "max", abs(arm_gap), max_arm_gap);
-    error_treshold ("nock_depth", "max", nock_depth, base_height - arrow_offset);
-    error_treshold ("nock_width", "max", nock_width, arrow_diameter);
-    error_treshold ("nock_diameter", "min", nock_diameter, arrow_diameter);
+    error_threshold ("arrow_diameter", "min", arrow_diameter, min_arrow_diameter);
+    error_threshold ("base_height", "min", base_height, min_base_height);
+    error_threshold ("hinge_depth", "min", hinge_depth, min_base_height);
+    error_threshold ("hinge_diameter", "min", hinge_diameter, min_hinge_diameter);
+    error_threshold ("hinge_diameter", "max", hinge_diameter, hinge_depth);
+    error_threshold ("hinge_depth", "max", hinge_depth, base_height);
+    error_threshold ("hinge_width", "min", hinge_width, min_hinge_width);
+    error_threshold ("hinge_width", "max", hinge_width, max_hinge_width);
+    error_threshold ("hinge_thickness", "min", hinge_thickness, min_hinge_thickness);
+    error_threshold ("hinge_thickness", "max", hinge_thickness, max_hinge_thickness);
+    error_threshold ("joint_diameter", "max", joint_diameter, max_joint_diameter);
+    error_threshold ("vane_offset", "min", vane_offset, min_vane_offset);
+    error_threshold ("vane_width", "max", vane_width, max_vane_width);
+    error_threshold ("vane_turn", "max", abs(vane_turn), max_vane_turn);
+    error_threshold ("arrow_offset", "max", arrow_offset, base_height);
+    error_threshold ("arm_gap", "max", abs(arm_gap), max_arm_gap);
+    error_threshold ("nock_height", "max", nock_height, base_height - arrow_offset);
+    error_threshold ("nock_width", "max", nock_width, arrow_diameter);
 
     assert (min_hinge_width <= max_hinge_width && min_hinge_thickness <= max_hinge_thickness,
             "INVALID HINGE PARAMETERS"
     );
+
+    //Nested module definitions
+
+    //
+    //Module that can create both parts of the hinge by changing holer value
+    //# holer - if true, outline of the joint will be created and can be later subtracted from another solid, creating opening for hinge itself
+    //
+    module hinge (holer = true)
+    {
+        h = hinge_depth + arm_offset - hinge_radius;
+        w = !holer ? hinge_width - hinge_gap : hinge_width;
+        d = !holer ? hinge_diameter - hinge_gap : hinge_diameter;
+        pin = !holer && joint_style == "ball" ? joint_diameter - hinge_gap : joint_diameter;
+        hole_lip = 1;
+        rotate([90,-90,0]) mirror([0,1,0])
+            difference()
+            {
+                union()
+                {
+                    if (joint_style == "ball")
+                    {
+                        translate([0,0,w/2]) sphere(d=pin);
+                        translate([0,0,-w/2]) sphere(d=pin);
+                    }
+                    cylinder(w,d=d, center = true);     
+                    translate([h/2,0,0]) cube([h,d,w], true);
+                    if (holer)
+                    {
+                        translate([-d/2,0,-w/2]) 
+                            cube([h + d/2, d/2 + hole_lip, w]);
+                        if (joint_style == "pin") 
+                            cylinder( base_diameter, d=pin,  center = true);
+                    }
+                }
+                if (!holer)
+                {
+                    translate([h/2 - hole_lip,0, 0]) 
+                        cube([h + d, d + hole_lip, w - 2*hinge_thickness], true);
+                    if (joint_style == "pin")
+                        cylinder( w*2, d=pin, center=true);
+                }
+            }
+    }
 
     //base
     if (part_select == 1 || part_select == 0)
@@ -225,21 +288,20 @@ module jig (    part_select = 0,
     {
         difference()
         {
-            base_mold(a = arm_width, radius = base_radius, height = base_height, hulled=hulled_base);
-            if (nock)
-                translate([0,0,arrow_offset]) cylinder_holer(height = base_height,radius = nock_diameter/2,fn = fn);
-            else
-                translate([0,0,arrow_offset]) cylinder_holer(height = base_height,radius = arrow_diameter/2,fn = fn);
+            linear_extrude(base_height) base_outline(base_style, arm_width, base_radius, vane_count);
+            translate([0,0,arrow_offset]) cylinder_holer(height = base_height,radius = arrow_diameter_base/2,fn = fn);
             //hinge holer
-            for (i = [0:2]) 
+            for (i = [0:vane_count-1]) 
             {
-                rotate(a=[0,0,i*120]) 
+                rotate(a=[0,0,i*rotation_by]) 
                     translate([(base_radius) - hinge_radius, 0, base_height - hinge_depth + hinge_radius]) 
-                        hinge (hinge_width, hinge_thickness, hinge_diameter, hinge_depth + arm_offset - hinge_radius, hinge_pin, true, hinge_holes);
+                            hinge(true);
             }
         }
-        if (nock == true)
-            nock_insert(nock_width, nock_depth, nock_diameter, arrow_offset);
+        if (nock != "none")
+            translate([0,0,arrow_offset + nock_height/2])
+                rotate([0,0,nock == "optimal" && vane_count%2 == 0 && vane_count > 2 ? rotation_by/2 : 0])
+                    cube([nock_width, arrow_diameter_base, nock_height], true);
     }
 
     //arm
@@ -253,15 +315,15 @@ module jig (    part_select = 0,
             translate([0,-arm_width/2,base_height + arm_offset])  
                 cube([base_radius, arm_width, arm_height], false);
             //intersections with two remaining arms
-            rotate(a = 120) translate([ -arm_width,0,base_height + arm_offset]) 
+            rotate(a = rotation_by/2) translate([ -arm_width,0,base_height + arm_offset]) 
                 cube([arm_width*2, arrow_diameter, arm_height], false);
-            rotate(a = -120) mirror([0,1,0]) translate([ -arm_width,0,base_height + arm_offset]) 
+            rotate(a = -rotation_by/2) mirror([0,1,0]) translate([ -arm_width,0,base_height + arm_offset]) 
                 cube([arm_width*2, arrow_diameter, arm_height], false);
             //shaft hole
             translate([0,0,base_height]) 
                 cylinder(arm_height + base_height,d=arrow_diameter, true);
             //vane
-            if (helical == 0)
+            if (vane_style == "straight")
             {
                 translate([base_radius/2,0, vane_length/2 + arrow_offset + vane_offset])
                     rotate([vane_turn,0,0])
@@ -273,36 +335,35 @@ module jig (    part_select = 0,
                 //t - values from 0 to maximum spread (side of equilateral triangle in circumscribed cirle)
                 //x - distance from center to arm based on t
                 r = arrow_radius+arm_gap-0.35;
-                t = helical_adjust < (r * sqrt(3)) ? helical_adjust/2 : (r * sqrt(3))/2;
+                t = (vane_length/2) * sin(abs(vane_turn));
                 x = sqrt(pow(r,2) - pow(t*2,2)/4);
                 t_outer = (base_radius)*(t/x);
                 twist = 2*(atan(t_outer/vane_length/2) - atan(t/vane_length/2));
 
-                error_treshold ("helical_adjust", "max", t*2, r * sqrt(3));
                 translate([x,0, vane_length/2 + arrow_offset + vane_offset])
                     helical_vane(width = vane_width,
                                     length = vane_length,
                                     height = base_radius - x + 0.01,
-                                    spread = t - vane_width/2,
+                                    spread = t,
                                     twist = twist,
-                                    direction = helical_direction);
+                                    direction = sign(vane_turn));
             }
 
             //vane foot cutout
-            translate([0,0,arrow_offset + vane_offset]) cylinder(vane_length,r=arrow_radius + arm_gap, true);
-            minkowski()
+            vane_foot_easein = 2*arm_gap;
+            translate([0,0,arrow_offset + vane_offset - vane_foot_easein])
             {
-                translate([0,0,arrow_offset + vane_offset]) cylinder(vane_length,r=arrow_radius, true);
-                rotate_extrude(angle = 360, convexity = 2) 
                 difference()
                 {
-                    rotate([0,0,90]) ellipse(4*arm_gap, 2*arm_gap);
-                    translate([0,-2*arm_gap]) square(4*arm_gap, false);
+                    cylinder(vane_length + 2*vane_foot_easein,r=arrow_radius + arm_gap, true);
+                    cylinder_fillet(rc = arrow_radius, r1 = arm_gap, r2 = vane_foot_easein, bottom = true);
+                    translate(v = [0,0,vane_length + vane_foot_easein]) 
+                        cylinder_fillet(rc = arrow_radius, r1 = arm_gap, r2 = vane_foot_easein, bottom = false);
                 }
             }
         }
         translate([base_radius - hinge_radius, 0, base_height - hinge_depth + hinge_radius]) 
-            hinge(hinge_width - hinge_gap, hinge_thickness, hinge_diameter - hinge_gap, hinge_depth + arm_offset - hinge_radius, hinge_pin - hinge_gap, holer=false, hinge_holes=hinge_holes);
+                            hinge(false);
     }
 
     //lid
@@ -312,14 +373,23 @@ module jig (    part_select = 0,
     lid_gap = 0.25;
 
     if (part_select == 3 || part_select == 0)
-        translate((flag_showAll-1)*[3*base_radius,0,0])
-    difference()
+        translate((flag_showAll-1)*[3*base_radius,0,0]) 
+    union()
     {
         h = vane_offset-arm_offset-(base_height - arrow_offset) + lid_thickness;
         w = arm_width + lid_gap;
-        r = base_radius + lid_gap;
-        base_mold(a = w + lid_thickness, radius = r + lid_thickness, height = h, hulled=hulled_base);
-        translate([0,0,lid_thickness] )base_mold(a = w, radius = r, height = h, hulled=hulled_base);
-        base_mold(a = w - lid_lip, radius = r - lid_lip, height = h, hulled=hulled_base);
+        r = base_radius + lid_gap/2;
+        linear_extrude(h) 
+            difference()
+            {
+                offset(delta=lid_thickness) base_outline(lid_style, w, r, vane_count);
+                base_outline("star", w, r, vane_count);
+            }
+        linear_extrude(lid_thickness) 
+            difference()
+            {
+                base_outline(lid_style, w, r, vane_count);
+                offset(delta=-lid_lip) base_outline("star", w, r, vane_count);
+            }
     }
 }

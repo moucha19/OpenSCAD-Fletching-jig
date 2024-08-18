@@ -1,5 +1,6 @@
 use <fletching_jig.scad>
 
+/* [Rendering options] */
 
 // Quality of the generated round elements of the jig. Higher values will generate more polygons, smoother surfaces and slow down the computations.
 $fn=30; // [10:10:100]
@@ -10,7 +11,15 @@ part_select_gui = 0; //[0:All, 1:Base only, 2:Arm only, 3:Lid only]
 part_select_cmd = -1;
 part_select = part_select_cmd < 0 ? part_select_gui : part_select_cmd;
 
-/* [Jig settings] */
+/* [Jig style] */
+// Style of the base.
+base_style = "polygon"; // [ "polygon":Polygon, "star":Star ]
+// Style of the lid.
+lid_style = "polygon"; // [ "polygon":Polygon, "star":Star ]
+// You can either have a snap-in ball joints a hole for external axle (like bolt or piece of filament).
+joint_style = "ball"; // [ "ball":Ball joint, "pin":Pin joint ]
+
+/* [Jig dimensions] */
 
 // Your arrow diameter. This number should be slightly bigger than the arrow itself to take into account the precision of your printer.
 arrow_diameter = 6;//[2:0.1:30]
@@ -33,11 +42,8 @@ hinge_diameter = 5.1;
 // How deep into base is the hinge cutout. The maximum value is the base height. Smaller values will be harder to assemble as the arms will be less flexible.
 hinge_depth = 10.1;
 
-// Diameter of the sphere that pivots the halves of the hinge. Maximum depends on both the hinge diameter and the space between hinge extensions. Larger values will provide more strength to the pivot. Smaller values will be easier to pop into place when assembling. See hinge holes below.
-hinge_pin = 3.1;
-
-// Makes holes for a pin or bolt rather than a sphere pivot for the hinge. You can use a bit of filament as the pin. If so, recommend hinge_pin 2.0 for 1.75mm filament
-hinge_style = "ball joint"; // ["ball joint", "pin hole"] 
+// Diameter of the joint that connects two halves of the hinge together. Maximum depends on both the hinge diameter and the joint style.
+joint_diameter = 3.1;
 
 // Gap for the vane foot in the arm so that the tension is distributed evenly on the vanes during clamping. This value will depend on your vanes. A value too small will clamp unevenly, a value too large will not clamp the vane.
 arm_gap = 0.5;
@@ -45,19 +51,13 @@ arm_gap = 0.5;
 // Distance between the top of the base and bottom of the arm.
 arm_offset = 1.5;//[0.1:0.1:2]
 
-// nock for aligning wooden arrows that have a carved-in nock
-nock = true;
-
-// Width of the nock (measure smallest point)
-nock_width = 3;//[1:0.1:5]
-
-// Depth of the nock (height of the nock guide)
-nock_depth = 4;//[1:0.1:10]
-
-// Outer width of the nock
-nock_diameter = 6;//[2:0.1:30]
-
 /* [Fletching] */
+
+//Select vane style
+vane_style = "straight";//["straight":Straight, "helical":Helical]
+
+// Number of vanes.
+vane_count = 3;//[2:1:5]
 
 // Length of the vane.
 vane_length = 72.1;//[0:0.1:200]
@@ -68,29 +68,30 @@ vane_width = 1.1;//[0:0.1:10]
 // How far from the end of arrow will the vane be. The minimal value will depend on the arrow offset, the base height and the arm offset.
 vane_offset = 25.1;//[0:0.1:200]
 
-//Select vane style
-helical = 0;//[0:Offset, 1:Helical]
+// Offset of the fletching in degrees. The maximum value will depend on the arrow radius, the fletching width, the fletching length as well as the arm gap.
+vane_turn = 0;//[-30:0.1:30]
 
-// Offset of the fletching in degrees. The maximum value will depend on the arrow radius, the fletching width, the fletching length as well as the arm gap. This value is ignored if the helical option is chosen.
-vane_turn = 0;// [-30:0.1:30]
+/* [Nock alignment] */
 
-// Horizontal distance between the bottom and top corner of the helical vane. This value is only used if helical fletching is enabled. The maximum value depends on the arrow radius and the arm gap.
-helical_adjust = 3.5; //[0:0.1:30]
+// Alignment guide for nocked arrows. For even vane count, you can select if you want to align nock with index vane, or if you prefer to align it between vanes for optimal clearance. 
+nock = "none"; // [ "none":Disabled, "static" : Index vane, "optimal":Optimal clearance]
 
-// Direction of the helical fletching and thus the arrow spin direction.
-helical_direction = 1;//[1:left, -1:right]
+// Width of the nock (measure smallest point)
+nock_width = 3;//[0:0.1:5]
 
-// Whether the base (and lid) have joined up edges making hexagon like shape or not joined like a forked cross. Cross shape is better for using hinge pins or screws. 
-base_style = "hexagon"; // [ "hexagon", "cross" ]
+// Depth of the nock groove (height of the nock guide)
+nock_height = 4;//[0:0.1:20]
 
-
+// Nock diameter. If it is larger than the arrow diameter, it will be used for the hole in the base, otherwise it has no effect.
+nock_diameter = 0;//[2:0.1:30]
 
 // Verbose info for command line rendering
 if (part_select_cmd != -1)
 {
     echo(str("Selected part = ", part_select));
     echo(str("Arrow diameter = ", arrow_diameter));
-    echo(str("Vane turn style = ", helical == 1 ? "Helical" : "Offset"));
+    echo(str("Vane style = ", vane_style == "helical" ? "Helical" : "Straight"));
+    echo(str("Vane turn = ", vane_turn));
 }
 
 jig (
@@ -102,20 +103,20 @@ jig (
         hinge_thickness,
         hinge_diameter,
         hinge_depth,
-        hinge_pin,
+        joint_diameter,
         arm_gap,
         arm_offset,
+        vane_style,
+        vane_count,
         vane_length,
         vane_width,
         vane_offset,
         vane_turn,
-        helical,
-        helical_adjust,
-        helical_direction,
         nock,
         nock_width,
-        nock_depth,
+        nock_height,
         nock_diameter,
+        joint_style,
         base_style,
-        hinge_style
+        lid_style
     );
