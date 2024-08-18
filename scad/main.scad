@@ -12,12 +12,12 @@ part_select_cmd = -1;
 part_select = part_select_cmd < 0 ? part_select_gui : part_select_cmd;
 
 /* [Jig style] */
-// You can either have a snap-in ball joints a hole for external axle (like bolt or piece of filament).
-hinge_style = "ball"; // [ "ball":Ball joint, "axle":Axle ]
 // Style of the base.
 base_style = "polygon"; // [ "polygon":Polygon, "star":Star ]
 // Style of the lid.
 lid_style = "polygon"; // [ "polygon":Polygon, "star":Star ]
+// You can either have a snap-in ball joints a hole for external axle (like bolt or piece of filament).
+joint_style = "ball"; // [ "ball":Ball joint, "pin":Pin joint ]
 
 /* [Jig dimensions] */
 
@@ -42,8 +42,8 @@ hinge_diameter = 5.1;
 // How deep into base is the hinge cutout. The maximum value is the base height. Smaller values will be harder to assemble as the arms will be less flexible.
 hinge_depth = 10.1;
 
-// Diameter of the sphere that connects two halves of the hinge together. Maximum depends on both the hinge diameter and the space between hinge extensions. Larger values will provide more strength to the pivot. Smaller values will be easier to pop into place when assembling.
-hinge_pin = 3.1;
+// Diameter of the joint that connects two halves of the hinge together. Maximum depends on both the hinge diameter and the joint style.
+joint_diameter = 3.1;
 
 // Gap for the vane foot in the arm so that the tension is distributed evenly on the vanes during clamping. This value will depend on your vanes. A value too small will clamp unevenly, a value too large will not clamp the vane.
 arm_gap = 0.5;
@@ -102,7 +102,7 @@ jig (
         hinge_thickness,
         hinge_diameter,
         hinge_depth,
-        hinge_pin,
+        joint_diameter,
         arm_gap,
         arm_offset,
         vane_style,
@@ -115,7 +115,7 @@ jig (
         nock_width,
         nock_height,
         nock_diameter,
-        hinge_style,
+        joint_style,
         base_style,
         lid_style
     );
