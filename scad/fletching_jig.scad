@@ -166,7 +166,7 @@ module jig (    part_select = 0,
                         ? (abs(hinge_width) <= max_hinge_width ? abs(hinge_width) : max_hinge_width) 
                         : min_hinge_width;
 
-    max_joint_diameter = min(hinge_diameter, hinge_width - hinge_gap - 2*min_hinge_thickness);
+    max_joint_diameter = joint_style == "ball" ? min(hinge_diameter - 2*min_gap, hinge_width - hinge_gap - 2*min_hinge_thickness) : hinge_diameter - 2*min_gap;
     joint_diameter = abs(joint_diameter) <= max_joint_diameter ? abs(joint_diameter) : max_joint_diameter;
 
     max_hinge_thickness = joint_style == "ball" ? (hinge_width-hinge_gap-joint_diameter)/2 : (hinge_width-hinge_gap)/2;
@@ -257,8 +257,11 @@ module jig (    part_select = 0,
             {
                 union()
                 {
-                    translate([0,0,w/2]) sphere(d=pin);
-                    translate([0,0,-w/2]) sphere(d=pin);
+                    if (joint_style == "ball")
+                    {
+                        translate([0,0,w/2]) sphere(d=pin);
+                        translate([0,0,-w/2]) sphere(d=pin);
+                    }
                     cylinder(w,d=d, center = true);     
                     translate([h/2,0,0]) cube([h,d,w], true);
                     if (holer)
