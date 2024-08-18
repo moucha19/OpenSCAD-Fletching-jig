@@ -41,7 +41,7 @@ Although I provide several pre-rendered files as an example, it is very likely t
 
 ### Parameters
 
-Parameter | Description | Tresholds
+Parameter | Description | Thresholds
 --- | --- | ---
 base_style | choose the base shape | `"polygon"` or `"star"`
 lid_style | choose the outer lid shape | `"polygon"` or `"star"`
@@ -69,7 +69,7 @@ nock_diameter | if the nock alignment guide is enabled, this value takes precede
 
 ![](./doc/img/parameter-reference-readme.svg)
 
-### Tresholds
+### Thresholds
 
 Like I already mentioned, I've take some precautions to ensure a valid outputs.
 
@@ -81,11 +81,11 @@ arrow_offset = 3;//[0:0.1:100]
 ```
 where comment behind the assignment means *[min:precision:max]*. Go to [customizer documentation](https://customizer.makerbot.com/docs) for more information.
 
-Second are tresholds in the module itself that are actually checking if desired parameters make sense or not. For example, if you have small jig for 6mm arrows, you can't have 10 centimeter wide hinge. So even if you're able to set something like this in the customizer, invalid parameters will be truncated in the module to a closest valid value. If this happens, you'll be informed about it in the console window with similiar line:
+Second are thresholds in the module itself that are actually checking if desired parameters make sense or not. For example, if you have small jig for 6mm arrows, you can't have 10 centimeter wide hinge. So even if you're able to set something like this in the customizer, invalid parameters will be truncated in the module to a closest valid value. If this happens, you'll be informed about it in the console window with similar line:
 
-> hinge_thickness treshold (max = 5.25) reached!
+> hinge_thickness threshold (max = 5.25) reached!
 
-List of some tresholds is in the table above. Some extreme values may still produce invalid results. That could either be because fixing it is more trouble than it's worth or because calculation of tresholds is impossible. Or it can simply be an oversight on my part. If you think something can be improved or you discover a bug, raise an issue or sumbit PR. 
+List of some thresholds is in the table above. Some extreme values may still produce invalid results. That could either be because fixing it is more trouble than it's worth or because calculation of thresholds is impossible. Or it can simply be an oversight on my part. If you think something can be improved or you discover a bug, raise an issue or submit PR. 
 
 Also, not all parameters are available in the customizer. Some of them do not change and should not have an effect on the validity of the generated output. However, if you did some testing and think some of these default values could be adjusted to generate better results, let me know.
 

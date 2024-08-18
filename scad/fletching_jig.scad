@@ -1,20 +1,20 @@
 use <components.scad>
 
 //Functions that create console messages
-module error_treshold (value_name, treshold_name, value, treshold)
+module error_threshold (value_name, threshold_name, value, threshold)
 {
-    if (value == treshold) 
+    if (value == threshold) 
     {
-        message = str(value_name," treshold (", treshold_name, " = ", treshold, ") reached!");
+        message = str(value_name," threshold (", threshold_name, " = ", threshold, ") reached!");
         if (version()[0] > 2019)
             echo(message);
         else
             echo(str("<font color='red'>", message, "</font>"));
     }
 }
-module info_treshold (value_name, treshold_name, treshold)
+module info_threshold (value_name, threshold_name, threshold)
 {
-    message = str("Current ", treshold_name, " for ", value_name, " is ", treshold);
+    message = str("Current ", threshold_name, " for ", value_name, " is ", threshold);
     if (version()[0] > 2019)
         echo(message);
     else
@@ -142,7 +142,7 @@ module jig (    part_select = 0,
     min_gap = 0.6;
     flag_showAll = part_select == 0 ? 0 : 1; 
 
-    //input corrections and tresholds
+    //input corrections and thresholds
     min_arrow_diameter = 2;
     arrow_diameter = abs(arrow_diameter) >= min_arrow_diameter ? abs(arrow_diameter) : min_arrow_diameter;
     arrow_diameter_base = nock != "none" ? max(arrow_diameter, nock_diameter) : arrow_diameter;
@@ -212,28 +212,28 @@ module jig (    part_select = 0,
     vane_turn = abs(vane_turn) <= max_vane_turn ? vane_turn : sign(vane_turn)*max_vane_turn;
 
     //error report
-    info_treshold ("vane_offset", "minimal value", min_vane_offset);
-    info_treshold ("vane_turn", "maximum angle", max_vane_turn);
-    info_treshold ("vane_width", "maximum width", max_vane_width);
+    info_threshold ("vane_offset", "minimal value", min_vane_offset);
+    info_threshold ("vane_turn", "maximum angle", max_vane_turn);
+    info_threshold ("vane_width", "maximum width", max_vane_width);
 
-    error_treshold ("arrow_diameter", "min", arrow_diameter, min_arrow_diameter);
-    error_treshold ("base_height", "min", base_height, min_base_height);
-    error_treshold ("hinge_depth", "min", hinge_depth, min_base_height);
-    error_treshold ("hinge_diameter", "min", hinge_diameter, min_hinge_diameter);
-    error_treshold ("hinge_diameter", "max", hinge_diameter, hinge_depth);
-    error_treshold ("hinge_depth", "max", hinge_depth, base_height);
-    error_treshold ("hinge_width", "min", hinge_width, min_hinge_width);
-    error_treshold ("hinge_width", "max", hinge_width, max_hinge_width);
-    error_treshold ("hinge_thickness", "min", hinge_thickness, min_hinge_thickness);
-    error_treshold ("hinge_thickness", "max", hinge_thickness, max_hinge_thickness);
-    error_treshold ("joint_diameter", "max", joint_diameter, max_joint_diameter);
-    error_treshold ("vane_offset", "min", vane_offset, min_vane_offset);
-    error_treshold ("vane_width", "max", vane_width, max_vane_width);
-    error_treshold ("vane_turn", "max", abs(vane_turn), max_vane_turn);
-    error_treshold ("arrow_offset", "max", arrow_offset, base_height);
-    error_treshold ("arm_gap", "max", abs(arm_gap), max_arm_gap);
-    error_treshold ("nock_height", "max", nock_height, base_height - arrow_offset);
-    error_treshold ("nock_width", "max", nock_width, arrow_diameter);
+    error_threshold ("arrow_diameter", "min", arrow_diameter, min_arrow_diameter);
+    error_threshold ("base_height", "min", base_height, min_base_height);
+    error_threshold ("hinge_depth", "min", hinge_depth, min_base_height);
+    error_threshold ("hinge_diameter", "min", hinge_diameter, min_hinge_diameter);
+    error_threshold ("hinge_diameter", "max", hinge_diameter, hinge_depth);
+    error_threshold ("hinge_depth", "max", hinge_depth, base_height);
+    error_threshold ("hinge_width", "min", hinge_width, min_hinge_width);
+    error_threshold ("hinge_width", "max", hinge_width, max_hinge_width);
+    error_threshold ("hinge_thickness", "min", hinge_thickness, min_hinge_thickness);
+    error_threshold ("hinge_thickness", "max", hinge_thickness, max_hinge_thickness);
+    error_threshold ("joint_diameter", "max", joint_diameter, max_joint_diameter);
+    error_threshold ("vane_offset", "min", vane_offset, min_vane_offset);
+    error_threshold ("vane_width", "max", vane_width, max_vane_width);
+    error_threshold ("vane_turn", "max", abs(vane_turn), max_vane_turn);
+    error_threshold ("arrow_offset", "max", arrow_offset, base_height);
+    error_threshold ("arm_gap", "max", abs(arm_gap), max_arm_gap);
+    error_threshold ("nock_height", "max", nock_height, base_height - arrow_offset);
+    error_threshold ("nock_width", "max", nock_width, arrow_diameter);
 
     assert (min_hinge_width <= max_hinge_width && min_hinge_thickness <= max_hinge_thickness,
             "INVALID HINGE PARAMETERS"
