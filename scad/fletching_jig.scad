@@ -294,7 +294,7 @@ module jig (    part_select = 0,
             for (i = [0:vane_count-1]) 
             {
                 rotate(a=[0,0,i*rotation_by]) 
-                    translate([(base_radius) - hinge_radius, 0, base_height - hinge_depth + hinge_radius]) 
+                    translate([(base_radius) - hinge_radius + hinge_gap/2, 0, base_height - hinge_depth + hinge_radius]) 
                             hinge(true);
             }
         }
@@ -362,7 +362,7 @@ module jig (    part_select = 0,
                 }
             }
         }
-        translate([base_radius - hinge_radius, 0, base_height - hinge_depth + hinge_radius]) 
+        translate([base_radius - hinge_radius + hinge_gap/2, 0, base_height - hinge_depth + hinge_radius]) 
                             hinge(false);
     }
 
