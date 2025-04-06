@@ -1,17 +1,26 @@
 use <components.scad>
 
 //Functions that create console messages
-module error_threshold (value_name, threshold_name, value, threshold)
+
+//Check a bound and print a coloured error message if exceeded.
+//#value_name - the variable being checked
+//#threshold_name - "min" or "max"  (others silently ignored)
+//#value - value of the variable to check against bounds
+//#threshold - variable must be less than / greater than this threshold for "max" and "min" respectively.
+module error_bounds_check (value_name, threshold_name, value, threshold)
 {
-    if (value == threshold) 
+    if((threshold_name == "max") && (value > threshold) || (threshold_name == "min") && (value < threshold) )
     {
-        message = str(value_name," threshold (", threshold_name, " = ", threshold, ") reached!");
+        //TODO: make this assert() instead, as long as that won't break the thingiverse customiser.
+        message = str(value_name," bounds (", threshold_name, " = ", threshold, ") exceeded by value ", value, "!");
         if (version()[0] > 2019)
             echo(message);
         else
             echo(str("<font color='red'>", message, "</font>"));
     }
 }
+
+//Unused; Useful in test cases to print the bounds
 module info_threshold (value_name, threshold_name, threshold)
 {
     message = str("Current ", threshold_name, " for ", value_name, " is ", threshold);
@@ -88,6 +97,8 @@ module cylinder_holer(height = 1,radius = 1,fn = 30){
 
 //
 //All three main components of the jig are created here - arm, base and clamping lid
+//See main.scad for better descriptions of these parameters, their ranges and defaults.
+//# part_select - which part of the jig you want to show
 //# arrow_diameter - slightly bigger than the arrow itself (may vary depending on your printer)
 //# arrow_offset - distance between the bottom of the base and arrow
 //# base_height - height of the base
@@ -98,16 +109,21 @@ module cylinder_holer(height = 1,radius = 1,fn = 30){
 //# joint_diameter - diameter of the sphere that connects two halves of the hinge together 
 //# arm_gap - gap for the vane foot, so that tension during clamping is distributed evenly
 //# arm_offset - distance between the top of the base and bottom of the arm
+//# vane_style - straight or helical
+//# vane_count - the number of vanes around the arrow
 //# vane_length - length of the vane
 //# vane_width - width of the vane
 //# vane_offset - how far from the end of the arrow will the vane be
 //# vane_turn - sets OFFSET fletching in degrees
-//# helical - if true, HELICAL fletching will be used
-//# helical_adjust - horizontal distance between the bottom and top corner of the HELICAL vane
-//# helical_direction - sign of the value determines left or right spin (+ left; - right)
-//# nock - boolean (true/false) if nock should be added
-//# nock_width - gap size of the nock
+//# nock - if nock alignment guide should be added
+//# nock_width - gap size of the throat of the nock
 //# nock_height - the height you want the nock guide to be
+//# nock_diameter - if it is larger than the arrow diameter, it will be used for the hole in the base
+//# joint_style - ball or pin
+//# base_style - polygon or star
+//# lid_style - polygon or star
+//# lid_gap - clearance for the lid to slide on
+//# fn - standard parameter for curve rendering
 //
 module jig (    part_select = 0,
                 arrow_diameter = 6,
@@ -133,6 +149,7 @@ module jig (    part_select = 0,
                 joint_style = "ball",
                 base_style = "polygon",
                 lid_style = "polygon",
+                lid_gap = 0.3,
                 fn = $fn
              ) 
 {
@@ -211,29 +228,30 @@ module jig (    part_select = 0,
     max_vane_turn = asin(max_vane_spread/vane_length);
     vane_turn = abs(vane_turn) <= max_vane_turn ? vane_turn : sign(vane_turn)*max_vane_turn;
 
-    //error report
-    info_threshold ("vane_offset", "minimal value", min_vane_offset);
-    info_threshold ("vane_turn", "maximum angle", max_vane_turn);
-    info_threshold ("vane_width", "maximum width", max_vane_width);
+    min_lid_gap =0;
+    max_lid_gap =3;
 
-    error_threshold ("arrow_diameter", "min", arrow_diameter, min_arrow_diameter);
-    error_threshold ("base_height", "min", base_height, min_base_height);
-    error_threshold ("hinge_depth", "min", hinge_depth, min_base_height);
-    error_threshold ("hinge_diameter", "min", hinge_diameter, min_hinge_diameter);
-    error_threshold ("hinge_diameter", "max", hinge_diameter, hinge_depth);
-    error_threshold ("hinge_depth", "max", hinge_depth, base_height);
-    error_threshold ("hinge_width", "min", hinge_width, min_hinge_width);
-    error_threshold ("hinge_width", "max", hinge_width, max_hinge_width);
-    error_threshold ("hinge_thickness", "min", hinge_thickness, min_hinge_thickness);
-    error_threshold ("hinge_thickness", "max", hinge_thickness, max_hinge_thickness);
-    error_threshold ("joint_diameter", "max", joint_diameter, max_joint_diameter);
-    error_threshold ("vane_offset", "min", vane_offset, min_vane_offset);
-    error_threshold ("vane_width", "max", vane_width, max_vane_width);
-    error_threshold ("vane_turn", "max", abs(vane_turn), max_vane_turn);
-    error_threshold ("arrow_offset", "max", arrow_offset, base_height);
-    error_threshold ("arm_gap", "max", abs(arm_gap), max_arm_gap);
-    error_threshold ("nock_height", "max", nock_height, base_height - arrow_offset);
-    error_threshold ("nock_width", "max", nock_width, arrow_diameter);
+    //error report
+    error_bounds_check ("arrow_diameter", "min", arrow_diameter, min_arrow_diameter);
+    error_bounds_check ("base_height", "min", base_height, min_base_height);
+    error_bounds_check ("hinge_depth", "min", hinge_depth, min_base_height);
+    error_bounds_check ("hinge_diameter", "min", hinge_diameter, min_hinge_diameter);
+    error_bounds_check ("hinge_diameter", "max", hinge_diameter, hinge_depth);
+    error_bounds_check ("hinge_depth", "max", hinge_depth, base_height);
+    error_bounds_check ("hinge_width", "min", hinge_width, min_hinge_width);
+    error_bounds_check ("hinge_width", "max", hinge_width, max_hinge_width);
+    error_bounds_check ("hinge_thickness", "min", hinge_thickness, min_hinge_thickness);
+    error_bounds_check ("hinge_thickness", "max", hinge_thickness, max_hinge_thickness);
+    error_bounds_check ("joint_diameter", "max", joint_diameter, max_joint_diameter);
+    error_bounds_check ("vane_offset", "min", vane_offset, min_vane_offset);
+    error_bounds_check ("vane_width", "max", vane_width, max_vane_width);
+    error_bounds_check ("vane_turn", "max", abs(vane_turn), max_vane_turn);
+    error_bounds_check ("arrow_offset", "max", arrow_offset, base_height);
+    error_bounds_check ("arm_gap", "max", abs(arm_gap), max_arm_gap);
+    error_bounds_check ("nock_height", "max", nock_height, base_height - arrow_offset);
+    error_bounds_check ("nock_width", "max", nock_width, arrow_diameter);
+    error_bounds_check ("lid_gap", "min", lid_gap, min_lid_gap);
+    error_bounds_check ("lid_gap", "max", lid_gap, max_lid_gap);
 
     assert (min_hinge_width <= max_hinge_width && min_hinge_thickness <= max_hinge_thickness,
             "INVALID HINGE PARAMETERS"
@@ -370,7 +388,6 @@ module jig (    part_select = 0,
 
     lid_thickness = 1;
     lid_lip = 2;
-    lid_gap = 0.25;
 
     if (part_select == 3 || part_select == 0)
         translate((flag_showAll-1)*[3*base_radius,0,0]) 

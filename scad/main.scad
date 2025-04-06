@@ -4,7 +4,7 @@ use <fletching_jig.scad>
 
 // Quality of the generated round elements of the jig. Higher values will generate more polygons, smoother surfaces and slow down the computations.
 $fn=30; // [10:10:100]
-// Select which part of the jig you want to show
+// Select which part of the jig you want to show or export
 part_select_gui = 0; //[0:All, 1:Base only, 2:Arm only, 3:Lid only]
 
 /* [Hidden] */
@@ -85,6 +85,9 @@ nock_height = 4;//[0:0.1:20]
 // Nock diameter. If it is larger than the arrow diameter, it will be used for the hole in the base, otherwise it has no effect.
 nock_diameter = 0;//[2:0.1:30]
 
+// Lid gap. Set to 2x your printer's overprint to allow clearance for the lid to slide on.  SLA around 0.3, FDM 0.5.
+lid_gap = 0.3;//[0:3]
+
 // Verbose info for command line rendering
 if (part_select_cmd != -1)
 {
@@ -118,5 +121,6 @@ jig (
         nock_diameter,
         joint_style,
         base_style,
-        lid_style
+        lid_style,
+        lid_gap
     );
