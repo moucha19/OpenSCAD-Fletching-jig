@@ -388,6 +388,7 @@ module jig (    part_select = 0,
 
     lid_thickness = 1;
     lid_lip = 2;
+    lid_hole_taper = 0.05;  //fraction, which allows the lid holes taper to allow the arms to slide in
 
     if (part_select == 3 || part_select == 0)
         translate((flag_showAll-1)*[3*base_radius,0,0]) 
@@ -396,17 +397,16 @@ module jig (    part_select = 0,
         h = vane_offset-arm_offset-(base_height - arrow_offset) + lid_thickness;
         w = arm_width + lid_gap;
         r = base_radius + lid_gap/2;
-        linear_extrude(h) 
-            difference()
-            {
-                offset(delta=lid_thickness) base_outline(lid_style, w, r, vane_count);
-                base_outline("star", w, r, vane_count);
-            }
+        difference()
+        {
+            linear_extrude(height=h) offset(delta=lid_thickness) base_outline(lid_style, w, r*(1+lid_hole_taper), vane_count);
+            linear_extrude(height=h, scale=1+lid_hole_taper) base_outline("star", w, r, vane_count);
+        }
         linear_extrude(lid_thickness) 
             difference()
             {
-                base_outline(lid_style, w, r, vane_count);
-                offset(delta=-lid_lip) base_outline("star", w, r, vane_count);
+                base_outline(lid_style, w, r*(1+lid_hole_taper), vane_count);
+                offset(delta=-lid_lip) base_outline("star", w, r*(1+lid_hole_taper), vane_count);
             }
     }
 }
