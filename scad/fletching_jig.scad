@@ -300,7 +300,7 @@ module jig (    part_select = 0,
         }
         if (nock != "none")
             translate([0,0,arrow_offset + nock_height/2])
-                rotate([0,0,nock == "optimal" && vane_count%2 == 0 && vane_count > 2 ? rotation_by/2 : 0])
+                rotate([0,0,nock == "alternate" && vane_count > 2 ? (vane_count%2 == 0 ? rotation_by/2 : 90) : 0])
                     cube([nock_width, arrow_diameter_base, nock_height], true);
     }
 

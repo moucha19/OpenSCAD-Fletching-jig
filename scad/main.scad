@@ -57,7 +57,7 @@ arm_offset = 1.5;//[0.1:0.1:2]
 vane_style = "straight";//["straight":Straight, "helical":Helical]
 
 // Number of vanes.
-vane_count = 3;//[2:1:5]
+vane_count = 3;//[2:1:6]
 
 // Length of the vane.
 vane_length = 72.1;//[0:0.1:200]
@@ -73,8 +73,8 @@ vane_turn = 0;//[-30:0.1:30]
 
 /* [Nock alignment] */
 
-// Alignment guide for nocked arrows. For even vane count, you can select if you want to align nock with index vane, or if you prefer to align it between vanes for optimal clearance. 
-nock = "none"; // [ "none":Disabled, "static" : Index vane, "optimal":Optimal clearance]
+// Alignment guide for nocked arrows. You can either choose to align nock to reference vane, or rotate nock to alternate symmetric orientation based on vane count.
+nock = "none"; // [ "none":Disabled, "reference" : Reference vane alignment, "alternate": Alternate alignment]
 
 // Width of the nock (measure smallest point)
 nock_width = 3;//[0:0.1:5]
