@@ -62,7 +62,7 @@ vane_length | length of the vane | 0 < ■
 vane_width | width of the vane | 0 < ■ < *in the console*
 vane_offset | how far from the end of the arrow will the vane be | *in the console* < ■
 vane_turn | sets rotation of the fletching in degrees, negative values flip the direction | ■ < *in the console*
-nock | choose whether to add a nock alignment guide and if so, how you want to rotate it | `"none"`, `"static"` or `"optimal"`
+nock | choose whether to add a nock alignment guide and if so, how you want to rotate it | `"none"`, `"reference"` or `"alternate"`
 nock_width | width of the nock guide, smallest point of the arrow nock | 0 < `arrow_diameter`
 nock_height | depth of nock in your arrow, this will be the height of the nock guide | 0 < `(base_height - arrow_offset)`
 nock_diameter | if the nock alignment guide is enabled, this value takes precedence over `arrow_diameter` for the base hole when the nocked arrow is wider than bare shaft | 0 < ■
