@@ -51,3 +51,74 @@ module cylinder_fillet(rc = 5, r1 = 1, r2 = 1, bottom = true)
         ellipse(2*r1, 2*r2);
     }
 }
+
+//
+//Creates a polyhedron which is a loft of two polygons
+//# bottom - bottom polygon points
+//# top - top polygon points
+//# z_bottom - position of bottom polygon on Z axis 
+//# z_top - position of top polygon on Z axis 
+//
+module loft(bottom, top, z_bottom=0, z_top=1)
+{
+ n = len(bottom);
+
+    points = concat(
+        [[0,0,z_bottom]],
+        [for (p = bottom) [p[0], p[1], z_bottom]],
+        [[0,0,z_top]],
+        [for (p = top) [p[0], p[1], z_top]]
+    );
+
+    bottom_center = 0;
+    top_center = n + 1;
+
+    bottom_offset = 1;
+    top_offset = n + 2;
+
+    side_faces =
+    [
+        for (i = [0:n-1])
+        let(
+            j = (i + 1) % n,
+
+            b0 = bottom_offset + i,
+            b1 = bottom_offset + j,
+
+            t0 = top_offset + i,
+            t1 = top_offset + j
+        )
+        each [
+            [b0, b1, t1],
+            [b0, t1, t0]
+        ]
+    ];
+
+    bottom_faces =
+    [
+        for (i = [0:n-1])
+        let(j = (i + 1) % n)
+            [bottom_center,
+             bottom_offset + j,
+             bottom_offset + i]
+    ];
+
+    top_faces =
+    [
+        for (i = [0:n-1])
+        let(j = (i + 1) % n)
+            [top_center,
+             top_offset + i,
+             top_offset + j]
+    ];
+
+    polyhedron(
+        points = points,
+        faces = concat(
+            side_faces,
+            bottom_faces,
+            top_faces
+        ),
+        convexity = 10
+    );
+}

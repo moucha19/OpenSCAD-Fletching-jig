@@ -41,6 +41,39 @@ module helical_vane (width = 1, length = 75, height = 10, spread = 4, twist = 15
 }
 
 //
+//Returns points that form base outline
+//# style - style of the outline
+//# a - length of primary side
+//# radius - distance from center to midpoint of primary side (apothem)
+//# vane_count - number of vanes
+//
+function base_outline_points(style, a, radius, vane_count) =
+    let(
+        rotation_by = 360/vane_count,
+        or = sqrt(pow(a/2, 2) + pow(radius, 2)), //? outside radius
+        alpha = atan((a/2)/radius), //? half angle of the hinge side
+        beta = (rotation_by - 2*alpha)/2, //? half angle of the secondary side
+        b = 2 * or * sin(beta), //? secondary side length
+        cross_radius = (or * cos(beta)) - ((b/2)*tan((180-rotation_by)/2))
+    )
+    [
+        for (i=[0:rotation_by:360-rotation_by]) 
+            if (style == "star") 
+                each 
+                [
+                    [cos(i - alpha)*or, sin(i - alpha)*or],
+                    [cos(i + alpha)*or, sin(i + alpha)*or],
+                    [cos(i + alpha + beta)*cross_radius, sin(i + alpha + beta)*cross_radius]
+                ]
+            else
+                each 
+                [
+                    [cos(i - alpha)*or, sin(i - alpha)*or],
+                    [cos(i + alpha)*or, sin(i + alpha)*or],
+                ]
+    ];
+
+//
 //Creates basic shape of the jig's base
 //# style - style of the outline
 //# a - length of primary side
@@ -49,29 +82,7 @@ module helical_vane (width = 1, length = 75, height = 10, spread = 4, twist = 15
 //
 module base_outline (style, a, radius, vane_count)
 {
-    rotation_by = 360/vane_count;
-    or = sqrt(pow(a/2, 2) + pow(radius, 2)); //? outside radius
-    alpha = atan((a/2)/radius); //? half angle of the hinge side
-    beta = (rotation_by - 2*alpha)/2; //? half angle of the secondary side
-    b = 2 * or * sin(beta); //? secondary side length
-    cross_radius = (or * cos(beta)) - ((b/2)*tan((180-rotation_by)/2));
-
-    points = [for (i=[0:rotation_by:360-rotation_by]) 
-        if (style == "star") 
-            each 
-            [
-                [cos(i - alpha)*or, sin(i - alpha)*or],
-                [cos(i + alpha)*or, sin(i + alpha)*or],
-                [cos(i + alpha + beta)*cross_radius, sin(i + alpha + beta)*cross_radius]
-            ]
-        else
-            each 
-            [
-                [cos(i - alpha)*or, sin(i - alpha)*or],
-                [cos(i + alpha)*or, sin(i + alpha)*or],
-            ]
-    ];
-    polygon(points);
+    polygon(base_outline_points(style, a, radius, vane_count));
 }
 
 //
@@ -377,25 +388,36 @@ module jig (    part_select = 0,
     lid_thickness = 1;
     lid_lip = 2;
     lid_gap = 0.25;
+    lid_chamfer = 0.5;
 
     if (part_select == 3 || part_select == 0)
-        translate((flag_showAll-1)*[3*base_radius,0,0]) 
-    union()
-    {
+        translate((flag_showAll-1)*[3*base_radius,0,0])
+    difference()
+    { 
         h = vane_offset-arm_offset-(base_height - arrow_offset) + lid_thickness;
         w = arm_width + lid_gap;
         r = base_radius + lid_gap/2;
-        linear_extrude(h) 
-            difference()
-            {
-                offset(delta=lid_thickness) base_outline(lid_style, w, r, vane_count);
-                base_outline("star", w, r, vane_count);
-            }
-        linear_extrude(lid_thickness) 
-            difference()
-            {
-                base_outline(lid_style, w, r, vane_count);
-                offset(delta=-lid_lip) base_outline("star", w, r, vane_count);
-            }
+        union()
+        {
+            linear_extrude(h) 
+                difference()
+                {
+                    offset(delta=lid_thickness) base_outline(lid_style, w, r, vane_count);
+                    base_outline("star", w, r, vane_count);
+                }
+            linear_extrude(lid_thickness) 
+                difference()
+                {
+                    base_outline(lid_style, w, r, vane_count);
+                    offset(delta=-lid_lip) base_outline("star", w, r, vane_count);
+                }
+        }
+        chamfer_l = lid_chamfer * lid_thickness;
+        translate([0,0,h - chamfer_l]) loft(
+            bottom = base_outline_points("star", w, r, vane_count), 
+            top = base_outline_points("star", w+2*chamfer_l, r+chamfer_l, vane_count),
+            z_bottom = 0,
+            z_top = chamfer_l
+        );
     }
 }
