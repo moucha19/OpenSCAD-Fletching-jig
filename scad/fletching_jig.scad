@@ -114,6 +114,7 @@ module cylinder_holer(height = 1,radius = 1,fn = 30){
 //# joint_style - "ball" for snap-in ball joints or "pin" for a hole for an external axle
 //# base_style - "polygon" or "star" outline for the base
 //# lid_style - "polygon" or "star" outline for the lid
+//# lid_gap - clearance between the lid and the arms it slides over
 //
 module jig (    part_select = 0,
                 arrow_diameter = 6,
@@ -139,6 +140,7 @@ module jig (    part_select = 0,
                 joint_style = "ball",
                 base_style = "polygon",
                 lid_style = "polygon",
+                lid_gap = 0.25,
                 fn = $fn
              ) 
 {
@@ -211,6 +213,8 @@ module jig (    part_select = 0,
 
     max_vane_width = 2*(arm_gap+arrow_radius)*sin(rotation_by/2);
     vane_width = abs(vane_width) <= max_vane_width ? abs(vane_width) : max_vane_width;
+    
+    lid_gap = abs(lid_gap);
 
     //max vane turn limit calculation
     max_vane_spread = max_vane_width - vane_width;
@@ -376,7 +380,6 @@ module jig (    part_select = 0,
 
     lid_thickness = 1;
     lid_lip = min(2, base_radius - arrow_radius);
-    lid_gap = 0.25;
 
     if (part_select == 3 || part_select == 0)
         translate((flag_showAll-1)*[3*base_radius,0,0]) 

@@ -51,6 +51,9 @@ arm_gap = 0.5;
 // Distance between the top of the base and bottom of the arm.
 arm_offset = 1.5;//[0.1:0.1:2]
 
+// Gap between the lid and the arms it slides over. A larger value makes the lid easier to slide on and off, a smaller value makes for a tighter fit.
+lid_gap = 0.25;//[0:0.01:1]
+
 /* [Fletching] */
 
 //Select vane style
@@ -118,5 +121,6 @@ jig (
         nock_diameter,
         joint_style,
         base_style,
-        lid_style
+        lid_style,
+        lid_gap
     );

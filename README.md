@@ -49,13 +49,14 @@ joint_style | either snap-in ball joints or pin joints | `"ball"` or `"pin"`
 arrow_diameter | slightly bigger than the arrow itself (may vary depending on your printer) | 2 < ■
 arrow_offset | distance between the bottom of the base and arrow | 0 < ■ < `base_height`
 base_height | height of the base | 5 < ■
-hinge_width | width of the hinge cutout on the base | 2.1 < ■ < *depends on arrow_diameter*
+hinge_width | width of the hinge cutout on the base | 2.2 < ■ < *depends on arrow_diameter*
 hinge_thickness | thickness of the hinge extension attached to the bottom of the arm | 1 < ■ < *depends on hinge_width and joint_diameter*
 hinge_diameter | diameter of the circular part of the hinge that revolves around a joint | 2 < ■ < `hinge_depth`
 hinge_depth | how deep into the base is the hinge cutout | 5 < ■ < `base_height`
 joint_diameter | diameter of the joint that connects two halves of the hinge together | 0 < ■ < *depends on joint_style*
 arm_gap | gap for the vane foot, so that tension during clamping is distributed evenly and the vane fits in the closed jig | 0 < ■ < 1.5
 arm_offset | distance between the top of the base and bottom of the arm | 0 < ■
+lid_gap | space between the lid and arms, higher values will produce looser fit (may vary depending on your printer)  | 0 < ■
 vane_count | number of vanes, typically 3 or 4 | 2 < ■ 
 vane_style | changes shape of the vane | `"straight"` or `"helical"`
 vane_length | length of the vane | 0 < ■
