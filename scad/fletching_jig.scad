@@ -375,7 +375,7 @@ module jig (    part_select = 0,
     //lid
 
     lid_thickness = 1;
-    lid_lip = 2;
+    lid_lip = min(2, base_radius - arrow_radius);
     lid_gap = 0.25;
 
     if (part_select == 3 || part_select == 0)
