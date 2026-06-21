@@ -23,8 +23,11 @@ module info_threshold (value_name, threshold_name, threshold)
 
 //
 //Creates helical vane
+//# width - width of the extruded vane profile
+//# length - length of the vane
 //# height - extrusion height
 //# spread - horizontal distance between edges of the vane
+//# twist - total twist angle applied across the extrusion
 //# direction - sign of the value determines left or right spin (+ left; - right)
 //
 module helical_vane (width = 1, length = 75, height = 10, spread = 4, twist = 15, direction = 1)
@@ -39,7 +42,7 @@ module helical_vane (width = 1, length = 75, height = 10, spread = 4, twist = 15
 
 //
 //Creates basic shape of the jig's base
-//# a - style of the outline
+//# style - style of the outline
 //# a - length of primary side
 //# radius - distance from center to midpoint of primary side (apothem)
 //# vane_count - number of vanes
@@ -98,16 +101,19 @@ module cylinder_holer(height = 1,radius = 1,fn = 30){
 //# joint_diameter - diameter of the sphere that connects two halves of the hinge together 
 //# arm_gap - gap for the vane foot, so that tension during clamping is distributed evenly
 //# arm_offset - distance between the top of the base and bottom of the arm
+//# vane_style - "straight" for a flat vane or "helical" for a true helical twist
+//# vane_count - number of vanes
 //# vane_length - length of the vane
 //# vane_width - width of the vane
 //# vane_offset - how far from the end of the arrow will the vane be
-//# vane_turn - sets OFFSET fletching in degrees
-//# helical - if true, HELICAL fletching will be used
-//# helical_adjust - horizontal distance between the bottom and top corner of the HELICAL vane
-//# helical_direction - sign of the value determines left or right spin (+ left; - right)
-//# nock - boolean (true/false) if nock should be added
+//# vane_turn - sets OFFSET/HELICAL fletching angle in degrees
+//# nock - "none", "reference" or "alternate"; enables and orients the nock alignment guide
 //# nock_width - gap size of the nock
 //# nock_height - the height you want the nock guide to be
+//# nock_diameter - overrides arrow_diameter for the base hole when set larger than it
+//# joint_style - "ball" for snap-in ball joints or "pin" for a hole for an external axle
+//# base_style - "polygon" or "star" outline for the base
+//# lid_style - "polygon" or "star" outline for the lid
 //
 module jig (    part_select = 0,
                 arrow_diameter = 6,

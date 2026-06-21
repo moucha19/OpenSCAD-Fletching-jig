@@ -7,7 +7,7 @@ Simple yet effective fletching jig that will adjust to all your needs. Intended 
 ### Features
 
 + highly adjustable to fit different arrows and vanes
-+ supports both 3 and 4 vanes
++ supports any number of vanes (typically 3 or 4)
 + straight, offset and **true** helical fletchings
 + features optional nock alignment
 + no additional tools required for assembly
@@ -55,7 +55,7 @@ hinge_diameter | diameter of the circular part of the hinge that revolves around
 hinge_depth | how deep into the base is the hinge cutout | 5 < ■ < `base_height`
 joint_diameter | diameter of the joint that connects two halves of the hinge together | 0 < ■ < *depends on joint_style*
 arm_gap | gap for the vane foot, so that tension during clamping is distributed evenly and the vane fits in the closed jig | 0 < ■ < 1.5
-arm_offset | distance between the top of the base and bottom of the arm | 0 < ■ < 1.5 
+arm_offset | distance between the top of the base and bottom of the arm | 0 < ■
 vane_count | number of vanes, typically 3 or 4 | 2 < ■ 
 vane_style | changes shape of the vane | `"straight"` or `"helical"`
 vane_length | length of the vane | 0 < ■

@@ -16,7 +16,7 @@ part_select = part_select_cmd < 0 ? part_select_gui : part_select_cmd;
 base_style = "polygon"; // [ "polygon":Polygon, "star":Star ]
 // Style of the lid.
 lid_style = "polygon"; // [ "polygon":Polygon, "star":Star ]
-// You can either have a snap-in ball joints a hole for external axle (like bolt or piece of filament).
+// You can either have a snap-in ball joints or a hole for external axle (like bolt or piece of filament).
 joint_style = "ball"; // [ "ball":Ball joint, "pin":Pin joint ]
 
 /* [Jig dimensions] */
